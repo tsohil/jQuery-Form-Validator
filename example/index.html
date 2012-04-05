@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>jQuery Form Validator v2.0</title>
+
+    <meta charset="UTF-8"/>
+
+    <script type="text/javascript" src="../jquery.js"></script>
+    <script type="text/javascript" src="../js/formvalidator/jquery.formvalidator.js"></script>
+
+    <script>
+
+        $.formUtils.loadModules('date.dev, security.dev, sweden.dev, backend.dev, ukvat.dev');
+
+        var showPage = function(p) {
+            $('.page:visible').fadeOut('fast', function() {
+                $('#'+p).fadeIn('fast');
+            });
+            return false;
+        };
+    </script>
+
+    <style>
+        * {
+            font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
+            color: #575757;
+        }
+
+        body {
+            background:#F2F2F2;
+        }
+
+        #page-container {
+            margin:0 auto;
+            max-width: 980px;
+            width:90%;
+        }
+
+        #content-wrapper {
+            background: #FFF;
+            border:#DDD solid 4px;
+            position:relative;
+            min-height: 300px;
+            box-shadow: rgba(0, 0, 0, .05) 1px 1px 5px 2px;
+        }
+
+        #content {
+            padding: 12px 200px 12px 12px;
+        }
+
+        #side-column {
+            height: 200px;
+            background: yellow;
+            position: absolute;
+            width: 200px;
+            top: 0;
+            right: 0;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div id="page-container">
+
+        <h1>jQuery Form Validator v2.0</h1>
+
+        <div id="content-wrapper">
+            <div id="content">
+                <div id="home" class="page">
+                    <h1>Hejsan</h1>
+                </div>
+            </div>
+
+            <div id="side-column">
+                <ul id="navigation">
+                    <li>
+                        <a href="#" onclick="return showPage('home')">
+                            Introduction
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="footer">
+
+        </div>
+    </div>
+
+</body>
+</html>

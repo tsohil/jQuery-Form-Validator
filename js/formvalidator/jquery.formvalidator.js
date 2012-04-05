@@ -219,7 +219,7 @@
             /** Input elements which value was not valid*/
             var errorInputs = [];
 
-            /** Form instance*/
+            /** Form instance */
             var $form = $(this);
 
             //
@@ -246,28 +246,32 @@
             //
             // Validate element values
             //
-            $form.find('input,textarea,select').each(function() {
-                if (!ignoreInput($(this).attr('name'), $(this).attr('type'))) {
+            $.formUtils.haltValidation = false;
+            var $elements = $form.find('input,textarea,select');
+            for(var i=0; i < $elements.length; i++) {
+                var $el = $elements.eq(i);
+                if (!ignoreInput($el.attr('name'), $el.attr('type'))) {
 
                     // memorize border color
-                    if ($.formUtils.defaultBorderColor === null && $(this).attr('type')) {
-                        $.formUtils.defaultBorderColor = $(this).css('border-color');
+                    if ($.formUtils.defaultBorderColor === null && $el.attr('type')) {
+                        $.formUtils.defaultBorderColor = $el.css('border-color');
                     }
 
                     var valid = $.formUtils.validateInput(
-                                                    $(this),
+                                                    $el,
                                                     language,
                                                     config,
                                                     $form
                                                 );
-                    
+
                     if(valid !== true) {
-                        errorInputs.push($(this));
-                        $(this).attr('data-error', valid);
+                        errorInputs.push($el);
+                        $el.attr('data-error', valid);
                         addErrorMessage(valid);
                     }
                 }
-            });
+
+            }
 
             //
             // Reset style and remove error class
@@ -282,7 +286,6 @@
             //
             $('.' + config.errorMessageClass).remove();
             $('.jquery_form_error_message').remove();
-
 
             //
             // Validation failed
@@ -325,7 +328,7 @@
                 return false;
             }
             
-            return true;
+            return !$.formUtils.haltValidation;
         },
 
         /**
@@ -349,6 +352,13 @@
         * Available validators
         */
         validators : {},
+
+        /**
+         * Setting this property to true during validation will
+         * stop further validation from taking place and form will
+         * not be sent
+         */
+        haltValidation : false,
 
         /**
         * Function for adding a validator
@@ -638,7 +648,7 @@ $.formUtils.addValidator({
                             '.so', '.sr', '.st', '.sv', '.sy', '.sz', '.tc', '.td', '.tf', '.tg', '.th', '.tj',
                             '.tk', '.tm', '.tn', '.to', '.tp', '.tr', '.tt', '.tv', '.tw', '.tz', '.ua', '.ug',
                             '.uk', '.um', '.us', '.uy', '.uz', '.va', '.vc', '.ve', '.vg', '.vi', '.vn', '.vu',
-                            '.ws', '.wf', '.ye', '.yt', '.yu', '.za', '.zm', '.zw', '.mobi', '.xxx');
+                            '.ws', '.wf', '.ye', '.yt', '.yu', '.za', '.zm', '.zw', '.me', '.mobi', '.xxx');
 
         var dot = val.lastIndexOf('.');
         var domain = val.substring(0, dot);
@@ -851,80 +861,6 @@ $.formUtils.addValidator({
     },
     errorMessage : '',
     errorMessageKey: 'badDate'
-});
-
-/*
-* Validate that string is a UK VAT Number
-* TODO: Extra Checking for other VAT Numbers (Other countries and UK Government/Health Authorities)
-* Code Adapted from http://www.codingforums.com/showthread.php?t=211967
-*/
-$.formUtils.addValidator({
-    name : 'validate_ukvatnumber',
-    validate : function(number) {
-    	number = number.replace(/[^0-9]/g, '');
-
-    	//Check Length
-    	if(number.length < 9) {
-    		return false;
-    	}
-
-    	var valid = false;
-
-    	var VATsplit = [];
-    	VATsplit = number.split("");
-
-    	var checkDigits = Number(VATsplit[7] + VATsplit[8]);  // two final digits as a number
-
-    	var firstDigit = VATsplit[0];
-    	var secondDigit = VATsplit[1];
-    	if ((firstDigit == 0) && (secondDigit >0)) {
-    		return false;
-    	}
-
-    	var total = 0;
-    	for (var i=0; i<7; i++) {  // first 7 digits
-    		total += VATsplit[i]* (8-i);  // sum weighted cumulative total
-    	}
-
-    	var c = 0;
-    	var i = 0;
-
-    	for (var m = 8; m>=2; m--) {
-    		c += VATsplit[i]* m;
-    		i++;
-    	}
-
-    	// Traditional Algorithm for VAT numbers issued before 2010
-
-    	while (total > 0) {
-    		total -= 97; // deduct 97 repeatedly until total is negative
-    	}
-    	total = Math.abs(total);  // make positive
-
-    	if (checkDigits == total) {
-    		valid = true;
-    	}
-
-    	// If not valid try the new method (introduced November 2009) by subtracting 55 from the mod 97 check digit if we can - else add 42
-
-    	if (!valid) {
-    		total = total%97  // modulus 97
-
-    		if (total >= 55) {
-    			total = total - 55
-    		} else {
-    			total = total + 42
-    		}
-
-    		if (total == checkDigits) {
-    			valid = true;
-    		}
-    	}
-
-    	return valid;
-    },
-    errorMessage : '',
-    errorMessageKey: 'badUKVatAnswer'
 });
 
 /*
