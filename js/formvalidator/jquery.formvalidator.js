@@ -8,19 +8,22 @@
 *
 * $version 2.0.beta
 * $stable 1.3
+* $requires jQuery version >= 1.5
 */
 (function($) {
     $.extend($.fn, {
 
         /**
-         * Should be called on the element containing the input elements
-         *
-         * @param {Object} language Optional, will override jQueryFormUtils.LANG
-         * @param {Object} settings Optional, will override the default settings
-         * @return {jQuery}
-         */
+        * Should be called on the element containing the input elements
+        *
+        * @param {Object} language Optional, will override $.formUtils.LANG
+        * @param {Object} settings Optional, will override the default settings
+        * @return {jQuery}
+        */
         validateOnBlur : function(language, settings) {
-            $(this).find('textarea,input').blur(function() {
+            $(this)
+                .find('textarea,input')
+                    .blur(function() {
                        $(this).doValidate(language, settings);
                     });
 
@@ -28,12 +31,12 @@
         },
 
         /**
-         * Should be called on the element containing the input elements.
-         * <input data-help="The info that I want to display for the user when input is focused" ... />
-         *
-         * @param {String} attrName Optional, default is data-help
-         * @return {jQuery}
-         */
+        * Should be called on the element containing the input elements.
+        * <input data-help="The info that I want to display for the user when input is focused" ... />
+        *
+        * @param {String} attrName Optional, default is data-help
+        * @return {jQuery}
+        */
         showHelpOnFocus : function(attrName) {
             if(!attrName) {
                 attrName = 'data-help';
@@ -56,10 +59,12 @@
                             }
                         })
                         .blur(function() {
-                            $(this).parent().find('.jquery_form_help')
-                                .fadeOut('slow', function() {
-                                    $(this).remove();
-                                });
+                            $(this)
+                                .parent()
+                                .find('.jquery_form_help')
+                                    .fadeOut('slow', function() {
+                                        $(this).remove();
+                                    });
                         });
                 }
             });
@@ -68,15 +73,15 @@
         },
 
         /**
-         * Function that validates the value of given input and shows
-         * error message in a span element that is appended to the parent
-         * element
-         *
-         * @param {Object} language Optional, will override jQueryFormUtils.LANG
-         * @param {Object} settings Optional, will override the default settings
-         * @param {Boolean} attachKeyupEvent Optional
-         * @return {jQuery}
-         */
+        * Function that validates the value of given input and shows
+        * error message in a span element that is appended to the parent
+        * element
+        *
+        * @param {Object} language Optional, will override $.formUtils.LANG
+        * @param {Object} settings Optional, will override the default settings
+        * @param {Boolean} attachKeyupEvent Optional
+        * @return {jQuery}
+        */
         doValidate : function(language, settings, attachKeyupEvent) {
             if(typeof attachKeyupEvent == 'undefined') {
                 attachKeyupEvent = true;
@@ -85,24 +90,24 @@
             var $element = $(this);
 
             var config = {
-                    validationRuleAttribute : 'data-validation',
-                    errorElementClass : 'error', // Class that will be put on elements which value is invalid
-                    borderColorOnError : 'red',
-                    dateFormat : 'yyyy-mm-dd'
+                validationRuleAttribute : 'data-validation',
+                errorElementClass : 'error', // Class that will be put on elements which value is invalid
+                borderColorOnError : 'red',
+                dateFormat : 'yyyy-mm-dd'
             };
 
             if (settings) {
                 $.extend(config, settings);
             }
             if (language) {
-                $.extend(jQueryFormUtils.LANG,language);
+                $.extend($.formUtils.LANG,language);
             } else {
-                language = jQueryFormUtils.LANG;
+                language = $.formUtils.LANG;
             }
 
             var elementType = $element.attr('type');
-            if (jQueryFormUtils.defaultBorderColor === null && elementType !== 'submit' && elementType !== 'checkbox' && elementType !== 'radio') {
-                jQueryFormUtils.defaultBorderColor = $element.css('border-color');
+            if ($.formUtils.defaultBorderColor === null && elementType !== 'submit' && elementType !== 'checkbox' && elementType !== 'radio') {
+                $.formUtils.defaultBorderColor = $element.css('border-color');
             }
 
             // Remove possible error style applied by previous validation
@@ -112,14 +117,14 @@
                     .find('.jquery_form_error_message').remove();
             
             if(config.borderColorOnError !== '') {
-                $element.css('border-color', jQueryFormUtils.defaultBorderColor);
+                $element.css('border-color', $.formUtils.defaultBorderColor);
             }
 
             var $form = $element.parent();
             while($form.get(0).nodeName.toLowerCase() != 'form')
                 $form = $form.parent();
 
-            var validation = jQueryFormUtils.validateInput($element, language, config, $form);
+            var validation = $.formUtils.validateInput($element, language, config, $form);
 
             if(validation === true) {
                 $element.unbind('keyup');
@@ -144,16 +149,16 @@
         },
 
         /**
-         * Function that validate all inputs in a form
-         *
-         * @param language
-         * @param settings
-         */
+        * Function that validate all inputs in a form
+        *
+        * @param language
+        * @param settings
+        */
         validate : function(language, settings) {
 
             /*
-             * Config
-             */
+            * Config
+            */
             var config = {
                 ignore : [], // Names of inputs not to be validated even though node attribute containing the validation rules tells us to
                 errorElementClass : 'error', // Class that will be put on elements which value is invalid
@@ -166,25 +171,25 @@
             };
             
             /*
-             * Extends initial settings
-             */
+            * Extends initial settings
+            */
             if (settings) {
                 $.extend(config, settings);
             }
             if (language) {
-                $.extend(jQueryFormUtils.LANG, language);
+                $.extend($.formUtils.LANG, language);
             } else {
-                language = jQueryFormUtils.LANG;
+                language = $.formUtils.LANG;
             }
 
             
             /**
-             * Tells whether or not to validate element with this name and of this type
-             *
-             * @param {String} name
-             * @param {String} type
-             * @return {Boolean}
-             */
+            * Tells whether or not to validate element with this name and of this type
+            *
+            * @param {String} name
+            * @param {String} type
+            * @return {Boolean}
+            */
             var ignoreInput = function(name, type) {
                 if (type === 'submit' || type === 'button') {
                     return true;
@@ -199,23 +204,23 @@
             };
 
             /**
-             * Adds message to error message stack if not already in the message stack
-             *
-             * @param {String} mess
-             */
+            * Adds message to error message stack if not already in the message stack
+            *
+            * @param {String} mess
+            */
             var addErrorMessage = function(mess) {
                 if (jQuery.inArray(mess, errorMessages) < 0) {
                     errorMessages.push(mess);
                 }
             };
 
-            /** Error messages for this validation */
+            /** Error messages for this validation*/
             var errorMessages = [];
 
-            /** Input elements which value was not valid */
+            /** Input elements which value was not valid*/
             var errorInputs = [];
 
-            /** Form instance */
+            /** Form instance*/
             var $form = $(this);
 
             //
@@ -246,11 +251,11 @@
                 if (!ignoreInput($(this).attr('name'), $(this).attr('type'))) {
 
                     // memorize border color
-                    if (jQueryFormUtils.defaultBorderColor === null && $(this).attr('type')) {
-                        jQueryFormUtils.defaultBorderColor = $(this).css('border-color');
+                    if ($.formUtils.defaultBorderColor === null && $(this).attr('type')) {
+                        $.formUtils.defaultBorderColor = $(this).css('border-color');
                     }
 
-                    var valid = jQueryFormUtils.validateInput(
+                    var valid = $.formUtils.validateInput(
                                                     $(this),
                                                     language,
                                                     config,
@@ -269,7 +274,7 @@
             // Reset style and remove error class
             //
             $form.find('input,textarea,select')
-                    .css('border-color', jQueryFormUtils.defaultBorderColor)
+                    .css('border-color', $.formUtils.defaultBorderColor)
                     .removeClass(config.errorElementClass);
 
 
@@ -325,48 +330,279 @@
         },
 
         /**
-         * Plugin for displaying input length restriction
-         */
+        * Plugin for displaying input length restriction
+        */
         restrictLength : function(maxLengthElement) {
-            new jQueryFormUtils.lengthRestriction(this, maxLengthElement);
+            new $.formUtils.lengthRestriction(this, maxLengthElement);
             return this;
         }
-
     });
+
+    $.formUtils = {
+
+        /**
+        * Default border color, will be picked up first
+        * time form is validated
+        */
+        defaultBorderColor : null,
+
+        /**
+        * Available validators
+        */
+        validators : {},
+
+        /**
+        * Function for adding a validator
+        * @param {Object} validator
+        */
+        addValidator : function(validator) {
+            this.validators[validator.name] = validator;
+        },
+
+        /**
+        * @example
+        *  $.formUtils.loadModules('date, security.dev');
+        *
+        * Will load the scripts date.js and security.dev.js from the
+        * directory where this script resides. If you want to load
+        * the modules from another directory you can use the
+        * path argument.
+        *
+        * The script will be cached by the browser unless the module
+        * name ends with .dev
+        *
+        * @param {String} modules - Comma separated string
+        * @param {String} path - Optional
+        */
+        loadModules : function(modules, path) {
+
+            var loadModuleScripts = function(modules, path) {
+                $.each(modules.split(','), function(i, module) {
+                    var scriptUrl = path + $.trim(module) + '.js';
+                    jQuery.ajax({
+                        url : scriptUrl,
+                        cache : scriptUrl.substr(-7) != '.dev.js',
+                        dataType : 'script',
+                        error : function() {
+                            throw new Error('Unable to load form validation module '+module);
+                        }
+                    });
+                });
+            };
+
+            if(typeof path != 'undefined')
+                loadModuleScripts(modules, path);
+            else {
+                $(function() {
+                    var scripts = $('script');
+                    for(var i=0; i < scripts.length; i++) {
+                        var src = scripts.eq(i).attr('src');
+                        var scriptName = src.substr(src.lastIndexOf('/')+1, src.length);
+                        if(scriptName == 'jquery.formvalidator.js' || scriptName == 'jquery.formvalidator.min.js') {
+                            path = src.substr(0, src.lastIndexOf('/')) + '/';
+                            if(path == '/')
+                                path = '';
+
+                            break;
+                        }
+                    }
+                    loadModuleScripts(modules, path);
+                });
+            }
+        },
+
+        /**
+        * Validate the value of given element according to the validation rules
+        * found in the attribute data-validation. Will return true if valid,
+        * error message otherwise
+        *
+        * @param {jQuery} $el
+        * @param {Object} language ($.formUtils.LANG)
+        * @param {Object} config
+        * @param {jQuery} $form
+        * @return {String}|{Boolean}
+        */
+        validateInput : function($el, language, config, $form) {
+            var value = jQuery.trim($el.val());
+            var validationRules = $el.attr(config.validationRuleAttribute);
+
+            if (typeof validationRules != 'undefined' && validationRules !== null) {
+                var posRules = validationRules.split(' ');
+                for(var i=0; i < posRules.length; i++) {
+                    var validator = $.formUtils.validators[posRules[i]];
+                    if(typeof validator != 'undefined') {
+
+                        var isValid = validator.validate(value, $el, config, language, $form);
+                        if(!isValid) {
+                            var mess = $el.attr('data-error-message');
+                            if(typeof mess == 'undefined') {
+                                mess = language[validator.errorMessageKey];
+                                if(typeof mess == 'undefined')
+                                    mess = validator.errorMessage;
+                            }
+                            return mess;
+                        }
+
+                    }
+                }
+            }
+            return true;
+        },
+
+       /**
+        * <input data-validation="length12" /> => getAttribute($(element).attr('class'), 'length') = 12
+        * @param {String} attrValue
+        * @param {String} attrName
+        * @returns integer
+        */
+        getAttributeInteger : function(attrValue, attrName) {
+            var regex = new RegExp('(' + attrName + '[0-9\-]+)', "g");
+            return attrValue.match(regex)[0].replace(/[^0-9\-]/g, '');
+        },
+
+       /**
+        * Is it a correct date according to given dateFormat. Will return false if not, otherwise
+        * an array 0=>year 1=>month 2=>day
+        *
+        * @param {String} val
+        * @param {String} dateFormat
+        * @return {Array}|{Boolean}
+        */
+        parseDate : function(val, dateFormat) {
+            var divider = dateFormat.replace(/[a-zA-Z]/gi, '').substring(0,1);
+            var regexp = '^';
+            var formatParts = dateFormat.split(divider);
+            for(var i=0; i < formatParts.length; i++) {
+                regexp += (i > 0 ? '\\'+divider:'') + '(\\d{'+formatParts[i].length+'})';
+            }
+            regexp += '$';
+            
+            var matches = val.match(new RegExp(regexp));
+            if (matches === null) {
+                return false;
+            }
+        
+            var findDateUnit = function(unit, formatParts, matches) {
+                for(var i=0; i < formatParts.length; i++) {
+                    if(formatParts[i].substring(0,1) === unit) {
+                        return $.formUtils.parseDateInt(matches[i+1]);
+                    }
+                }
+                return -1;
+            };
+        
+            var month = findDateUnit('m', formatParts, matches);
+            var day = findDateUnit('d', formatParts, matches);
+            var year = findDateUnit('y', formatParts, matches);
+        
+            if ((month === 2 && day > 28 && (year % 4 !== 0  || year % 100 === 0 && year % 400 !== 0)) 
+            	|| (month === 2 && day > 29 && (year % 4 === 0 || year % 100 !== 0 && year % 400 === 0))
+            	|| month > 12 || month === 0) {
+                return false;
+            }
+            if ((this.isShortMonth(month) && day > 30) || (!this.isShortMonth(month) && day > 31) || day === 0) {
+                return false;
+            }
+        
+            return [year, month, day];
+        },
+
+       /**
+        * skum fix. är talet 05 eller lägre ger parseInt rätt int annars får man 0 när man kör parseInt?
+        *
+        * @param {String} val
+        * @param {Number}
+        */
+        parseDateInt : function(val) {
+            if (val.indexOf('0') === 0) {
+                val = val.replace('0', '');
+            }
+            return parseInt(val,10);
+        },
+
+        /**
+        * Has month only 30 days?
+        *
+        * @param {Number} m
+        * @return {Boolean}
+        */
+        isShortMonth : function(m) {
+            return (m % 2 === 0 && m < 7) || (m % 2 !== 0 && m > 7);
+        },
+
+       /**
+        * Restrict input length
+        *
+        * @param {jQuery} inputElement Jquery Html object
+        * @param {jQuery} maxLengthElement jQuery Html Object
+        * @return void
+        */
+        lengthRestriction : function(inputElement, maxLengthElement) {
+            this.input = inputElement;
+            this.maxLength = parseInt(maxLengthElement.text(),10);
+            var self = this;
+
+            $(this.input).keyup(function() {
+                    var $el = $(this);
+                    var val = $el.val();
+                    $el.val(val.substring(0, self.maxLength));
+                    maxLengthElement.text(self.maxLength - val.length);
+                })
+                .focus(function() {
+                    $(this).keyup();
+                })
+                .trigger('keyup');
+        },
+
+       /**
+        * Error dialogs
+        *
+        * @var {Object}
+        */
+        LANG : {
+            errorTitle : 'Form submission failed!',
+            requiredFields : 'You have not answered all required fields',
+            badTime : 'You have not given a correct time',
+            badEmail : 'You have not given a correct e-mail address',
+            badTelephone : 'You have not given a correct phone number',
+            badSecurityAnswer : 'You have not given a correct answer to the security question',
+            badDate : 'You have not given a correct date',
+            toLongStart : 'You have given an answer longer than ',
+            toLongEnd : ' characters',
+            toShortStart : 'You have given an answer shorter than ',
+            toShortEnd : ' characters',
+            badLength : 'You have to give an answer between ',
+            notConfirmed : 'Values could not be confirmed',
+            badDomain : 'Incorrect domain value',
+            badUrl : 'Incorrect url value',
+            badFloat : 'Incorrect float value',
+            badCustomVal : 'You gave an incorrect answer',
+            badInt : 'Incorrect integer value',
+            badSecurityNumber : 'Your social security number was incorrect',
+            badUKVatAnswer : 'Incorrect UK VAT Number'
+        }
+    }
+
 })(jQuery);
 
 
-/**
- * Namespace for helper functions
- */
-var jQueryFormUtils = {};
 
-/**
- * Static variable for holding default border color on input
- */
-jQueryFormUtils.defaultBorderColor = null;
+/* * * * * * * * * * * * * * * * * * * * * *
+  ADD CORE VALIDATORS
+* * * * * * * * * * * * * * * * * * * * */
 
-jQueryFormUtils.validators = {};
-
-jQueryFormUtils.addValidator = function(validator) {
-    this.validators[validator.name] = validator;    
-};
-
-jQueryFormUtils.loadModules = function(modules) {
-    
-};
 
 /*
- * Validate email
- */
-jQueryFormUtils.addValidator({
+* Validate email
+*/
+$.formUtils.addValidator({
     name : 'validate_email',
     validate : function(email) {
         var emailFilter = /^([a-zA-Z0-9_\.\-])+@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
         if(emailFilter.test(email)) {
            var parts = email.split('@');
            if(parts.length == 2) {
-               return jQueryFormUtils.validators.validate_domain.validate(parts[1]);
+               return $.formUtils.validators.validate_domain.validate(parts[1]);
            }
         }
         return false;
@@ -376,9 +612,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate domain name
- */
-jQueryFormUtils.addValidator({
+* Validate domain name
+*/
+$.formUtils.addValidator({
     name : 'validate_domain',
     validate : function(val) {
         val = val.replace('ftp://', '').replace('https://', '').replace('http://', '').replace('www.', '');
@@ -460,9 +696,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate required
- */
-jQueryFormUtils.addValidator({
+* Validate required
+*/
+$.formUtils.addValidator({
     name : 'required',
     validate : function(val) {
         return val !== '';
@@ -472,13 +708,13 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate min length
- */
-jQueryFormUtils.addValidator({
+* Validate min length
+*/
+$.formUtils.addValidator({
     name : 'validate_min_length',
     validate : function(value, $el, config, language) {
         var validationRules = $el.attr(config.validationRuleAttribute);
-        var minLength = jQueryFormUtils.getAttributeInteger(validationRules, 'length');
+        var minLength = $.formUtils.getAttributeInteger(validationRules, 'length');
         if (value.length < minLength) {
             this.errorMessage = language.toShortStart + minLength + language.toShortEnd;
             return false;
@@ -490,13 +726,13 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate max length
- */
-jQueryFormUtils.addValidator({
+* Validate max length
+*/
+$.formUtils.addValidator({
     name : 'validate_max_length',
     validate : function(value, $el, config, language) {
         var validationRules = $el.attr(config.validationRuleAttribute);
-        var maxLength = jQueryFormUtils.getAttributeInteger(validationRules, 'length');
+        var maxLength = $.formUtils.getAttributeInteger(validationRules, 'length');
         if (value.length > maxLength) {
             this.errorMessage = language.toLongStart + maxLength + language.toLongEnd;
             return false;
@@ -508,13 +744,13 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate length range
- */
-jQueryFormUtils.addValidator({
+* Validate length range
+*/
+$.formUtils.addValidator({
     name : 'validate_length',
     validate : function(value, $el, config, language) {
         var validationRules = $el.attr(config.validationRuleAttribute);
-        var lengthRange = jQueryFormUtils.getAttributeInteger(validationRules, 'length');
+        var lengthRange = $.formUtils.getAttributeInteger(validationRules, 'length');
         var range = lengthRange.split('-');
         if (value.length < parseInt(range[0],10) || value.length > parseInt(range[1],10)) {
             this.errorMessage = language.badLength + lengthRange + language.toLongEnd;
@@ -527,9 +763,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate confirmation
- */
-jQueryFormUtils.addValidator({
+* Validate confirmation
+*/
+$.formUtils.addValidator({
     name : 'validate_confirmation',
     validate : function(value, $el, config, language, $form) {
         var conf = '';
@@ -544,9 +780,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate url
- */
-jQueryFormUtils.addValidator({
+* Validate url
+*/
+$.formUtils.addValidator({
     name : 'validate_url',
     validate : function(url) {
         // contributed by Scott Gonzalez: http://projects.scottsplayground.com/iri/ but added support for arrays in the url ?arg[]=sdfsdf
@@ -557,7 +793,7 @@ jQueryFormUtils.addValidator({
             if(domainSlashPos > -1)
                 domain = domain.substr(0, domainSlashPos);
 
-            return jQueryFormUtils.validators.validate_domain.validate(domain); // todo: add support for IP-addresses
+            return $.formUtils.validators.validate_domain.validate(domain); // todo: add support for IP-addresses
         }
         return false;
     },
@@ -566,9 +802,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Simple spam check
- */
-jQueryFormUtils.addValidator({
+* Simple spam check
+*/
+$.formUtils.addValidator({
     name : 'validate_spamcheck',
     validate : function(val, $el, config) {
         var attr = $el.attr(config.validationRuleAttribute);
@@ -579,21 +815,21 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate number (floating or integer)
- */
-jQueryFormUtils.addValidator({
+* Validate number (floating or integer)
+*/
+$.formUtils.addValidator({
     name : 'validate_number',
     validate : function(val) {
-        return jQueryFormUtils.validators.validate_int.validate(val) || jQueryFormUtils.validators.validate_float.validate(val);
+        return $.formUtils.validators.validate_int.validate(val) || $.formUtils.validators.validate_float.validate(val);
     },
     errorMessage : '',
     errorMessageKey: 'badInt'
 });
 
 /*
- * Validate against regexp
- */
-jQueryFormUtils.addValidator({
+* Validate against regexp
+*/
+$.formUtils.addValidator({
     name : 'validate_custom',
     validate : function(val, $el, config) {
         var attr = $el.attr(config.validationRuleAttribute);
@@ -605,9 +841,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate integer
- */
-jQueryFormUtils.addValidator({
+* Validate integer
+*/
+$.formUtils.addValidator({
     name : 'validate_int',
     validate : function(val) {
         return val !== '' && val.replace(/[0-9]/g, '') === '';
@@ -617,9 +853,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate floating number
- */
-jQueryFormUtils.addValidator({
+* Validate floating number
+*/
+$.formUtils.addValidator({
     name : 'validate_float',
     validate : function(val) {
         return val.match(/^(\-|)([0-9]+)\.([0-9]+)$/) !== null;
@@ -629,9 +865,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate time hh:mm
- */
-jQueryFormUtils.addValidator({
+* Validate time hh:mm
+*/
+$.formUtils.addValidator({
     name : 'validate_time',
     validate : function(time) {
         if (time.match(/^(\d{2}):(\d{2})$/) === null) {
@@ -650,9 +886,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate swedish social security number yyyymmddXXXX
- */
-jQueryFormUtils.addValidator({
+* Validate swedish social security number yyyymmddXXXX
+*/
+$.formUtils.addValidator({
     name : 'validate_swesc',
     validate : function(securityNumber) {
         if (!securityNumber.match(/^(\d{4})(\d{2})(\d{2})(\d{4})$/)) {
@@ -660,8 +896,8 @@ jQueryFormUtils.addValidator({
         }
 
         var year = RegExp.$1;
-        var month = jQueryFormUtils.parseDateInt(RegExp.$2);
-        var day = jQueryFormUtils.parseDateInt(RegExp.$3);
+        var month = $.formUtils.parseDateInt(RegExp.$2);
+        var day = $.formUtils.parseDateInt(RegExp.$3);
 
         // var gender = parseInt( (RegExp.$4) .substring(2,3)) % 2; ==> 1 === male && 0 === female
 
@@ -676,7 +912,7 @@ jQueryFormUtils.addValidator({
         securityNumber = securityNumber.substring(2, securityNumber.length);
         var check = '';
         for (var i = 0; i < securityNumber.length; i++) {
-            check += ((((i + 1) % 2) + 1) * securityNumber.substring(i, i + 1));
+            check += ((((i + 1) % 2) + 1)* securityNumber.substring(i, i + 1));
         }
         var checksum = 0;
         for (i = 0; i < check.length; i++) {
@@ -690,9 +926,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate date
- */
-jQueryFormUtils.addValidator({
+* Validate date
+*/
+$.formUtils.addValidator({
     name : 'validate_date',
     validate : function(date, $el, conf) {
         var dateFormat = 'yyyy-mm-dd';
@@ -703,7 +939,7 @@ jQueryFormUtils.addValidator({
             dateFormat = conf.dateFormat;
         }
 
-        return jQueryFormUtils.parseDate(date, dateFormat) !== false;
+        return $.formUtils.parseDate(date, dateFormat) !== false;
     },
     errorMessage : '',
     errorMessageKey: 'badDate'
@@ -711,9 +947,9 @@ jQueryFormUtils.addValidator({
 
 
 /*
- * Is this a valid birth date
- */
-jQueryFormUtils.addValidator({
+* Is this a valid birth date
+*/
+$.formUtils.addValidator({
     name : 'validate_birthdate',
     validate : function(val, $el, conf) {
         var dateFormat = 'yyyy-mm-dd';
@@ -724,7 +960,7 @@ jQueryFormUtils.addValidator({
             dateFormat = conf.dateFormat;
         }
 
-        var inputDate = jQueryFormUtils.parseDate(val, dateFormat);
+        var inputDate = $.formUtils.parseDate(val, dateFormat);
         if (!inputDate) {
             return false;
         }
@@ -754,11 +990,11 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate that string is a UK VAT Number
- * TODO: Extra Checking for other VAT Numbers (Other countries and UK Government/Health Authorities)
- * Code Adapted from http://www.codingforums.com/showthread.php?t=211967
- */
-jQueryFormUtils.addValidator({
+* Validate that string is a UK VAT Number
+* TODO: Extra Checking for other VAT Numbers (Other countries and UK Government/Health Authorities)
+* Code Adapted from http://www.codingforums.com/showthread.php?t=211967
+*/
+$.formUtils.addValidator({
     name : 'validate_ukvatnumber',
     validate : function(number) {
     	number = number.replace(/[^0-9]/g, '');
@@ -783,14 +1019,14 @@ jQueryFormUtils.addValidator({
 
     	var total = 0;
     	for (var i=0; i<7; i++) {  // first 7 digits
-    		total += VATsplit[i] * (8-i);  // sum weighted cumulative total
+    		total += VATsplit[i]* (8-i);  // sum weighted cumulative total
     	}
 
     	var c = 0;
     	var i = 0;
 
     	for (var m = 8; m>=2; m--) {
-    		c += VATsplit[i] * m;
+    		c += VATsplit[i]* m;
     		i++;
     	}
 
@@ -828,12 +1064,12 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate that string is a swedish telephone number
- */
-jQueryFormUtils.addValidator({
+* Validate that string is a swedish telephone number
+*/
+$.formUtils.addValidator({
     name : 'validate_swemobile',
     validate : function(number) {
-        if (!jQueryFormUtils.validators.validate_phone.validate(number)) {
+        if (!$.formUtils.validators.validate_phone.validate(number)) {
             return false;
         }
 
@@ -852,9 +1088,9 @@ jQueryFormUtils.addValidator({
 });
 
 /*
- * Validate phone number, at least 7 digits only one hyphen and plus allowed
- */
-jQueryFormUtils.addValidator({
+* Validate phone number, at least 7 digits only one hyphen and plus allowed
+*/
+$.formUtils.addValidator({
     name : 'validate_phone',
     validate : function(tele) {
         var numPlus = tele.match(/\+/g);
@@ -873,167 +1109,3 @@ jQueryFormUtils.addValidator({
     errorMessage : '',
     errorMessageKey: 'badTelephone'
 });
-
-/**
- * Has month only 30 days?
- *
- * @param {Number} m
- * @return {Boolean}
- */
-jQueryFormUtils.isShortMonth = function(m) {
-    return (m % 2 === 0 && m < 7) || (m % 2 !== 0 && m > 7);
-};
-
-/**
- * Is it a correct date according to given dateFormat. Will return false if not, otherwise
- * an array 0=>year 1=>month 2=>day
- *
- * @param {String} val
- * @param {String} dateFormat
- * @return {Array}|{Boolean}
- */
-jQueryFormUtils.parseDate = function(val, dateFormat) {
-    var divider = dateFormat.replace(/[a-zA-Z]/gi, '').substring(0,1);
-    var regexp = '^';
-    var formatParts = dateFormat.split(divider);
-    for(var i=0; i < formatParts.length; i++) {
-        regexp += (i > 0 ? '\\'+divider:'') + '(\\d{'+formatParts[i].length+'})';
-    }
-    regexp += '$';
-    
-    var matches = val.match(new RegExp(regexp));
-    if (matches === null) {
-        return false;
-    }
-
-    var findDateUnit = function(unit, formatParts, matches) {
-        for(var i=0; i < formatParts.length; i++) {
-            if(formatParts[i].substring(0,1) === unit) {
-                return jQueryFormUtils.parseDateInt(matches[i+1]);
-            }
-        }
-        return -1;
-    };
-
-    var month = findDateUnit('m', formatParts, matches);
-    var day = findDateUnit('d', formatParts, matches);
-    var year = findDateUnit('y', formatParts, matches);
-
-    if ((month === 2 && day > 28 && (year % 4 !== 0  || year % 100 === 0 && year % 400 !== 0)) 
-    	|| (month === 2 && day > 29 && (year % 4 === 0 || year % 100 !== 0 && year % 400 === 0))
-    	|| month > 12 || month === 0) {
-        return false;
-    }
-    if ((this.isShortMonth(month) && day > 30) || (!this.isShortMonth(month) && day > 31) || day === 0) {
-        return false;
-    }
-
-    return [year, month, day];
-};
-
-/**
- * skum fix. är talet 05 eller lägre ger parseInt rätt int annars får man 0 när man kör parseInt?
- *
- * @param {String} val
- * @param {Number}
- */
-jQueryFormUtils.parseDateInt = function(val) {
-    if (val.indexOf('0') === 0) {
-        val = val.replace('0', '');
-    }
-    return parseInt(val,10);
-};
-
-/**
- * <input data-validation="length12" /> => getAttribute($(element).attr('class'), 'length') = 12
- * @param {String} attrValue
- * @param {String} attrName
- * @returns integer
- */
-jQueryFormUtils.getAttributeInteger = function(attrValue, attrName) {
-    var regex = new RegExp('(' + attrName + '[0-9\-]+)', "g");
-    return attrValue.match(regex)[0].replace(/[^0-9\-]/g, '');
-};
-
-/**
- * Validate the value of given element according to the validation rules
- * found in the attribute data-validation. Will return true if valid,
- * error message otherwise
- *
- * @param {jQuery} $el
- * @param {Object} language (jQueryFormUtils.LANG)
- * @param {Object} config
- * @param {jQuery} $form
- * @return {String}|{Boolean}
- */
-jQueryFormUtils.validateInput = function($el, language, config, $form) {
-    var value = jQuery.trim($el.val());
-    var validationRules = $el.attr(config.validationRuleAttribute);
-
-    if (typeof validationRules != 'undefined' && validationRules !== null) {
-        var posRules = validationRules.split(' ');
-        for(var i=0; i < posRules.length; i++) {
-            var validator = jQueryFormUtils.validators[posRules[i]];
-            if(typeof validator != 'undefined') {
-                var isValid = validator.validate(value, $el, config, language, $form);
-                if(!isValid) {
-                    var mess = jQueryFormUtils.LANG[validator.errorMessageKey];
-                    if(typeof mess == 'undefined')
-                        mess = validator.errorMessage;
-                    return mess;
-                }
-            }
-        }
-    }
-    return true;
-};
-
-/**
- * Error dialogs
- *
- * @var {Object}
- */
-jQueryFormUtils.LANG =  {
-    errorTitle : 'Form submission failed!',
-    requiredFields : 'You have not answered all required fields',
-    badTime : 'You have not given a correct time',
-    badEmail : 'You have not given a correct e-mail address',
-    badTelephone : 'You have not given a correct phone number',
-    badSecurityAnswer : 'You have not given a correct answer to the security question',
-    badDate : 'You have not given a correct date',
-    toLongStart : 'You have given an answer longer than ',
-    toLongEnd : ' characters',
-    toShortStart : 'You have given an answer shorter than ',
-    toShortEnd : ' characters',
-    badLength : 'You have to give an answer between ',
-    notConfirmed : 'Values could not be confirmed',
-    badDomain : 'Incorrect domain value',
-    badUrl : 'Incorrect url value',
-    badFloat : 'Incorrect float value',
-    badCustomVal : 'You gave an incorrect answer',
-    badInt : 'Incorrect integer value',
-    badSecurityNumber : 'Your social security number was incorrect',
-    badUKVatAnswer : 'Incorrect UK VAT Number'
-};
-
-/**
- * Restrict input length
- *
- * @param {jQuery} inputElement Jquery Html object
- * @param {jQuery} maxLengthElement jQuery Html Object
- * @return void
- */
-jQueryFormUtils.lengthRestriction = function(inputElement, maxLengthElement) {
-    this.input = inputElement;
-    this.maxLength = parseInt(maxLengthElement.text(),10);
-    var self = this;
-
-    $(this.input).keyup(function() {
-            $(this).val($(this).val().substring(0, self.maxLength));
-            maxLengthElement.text(self.maxLength - $(this).val().length);
-        })
-        .focus(function() {
-            $(this).keyup();
-        })
-        .trigger('keyup');
-};
