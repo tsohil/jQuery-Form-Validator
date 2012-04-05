@@ -588,7 +588,8 @@
             badCustomVal : 'You gave an incorrect answer',
             badInt : 'Incorrect integer value',
             badSecurityNumber : 'Your social security number was incorrect',
-            badUKVatAnswer : 'Incorrect UK VAT Number'
+            badUKVatAnswer : 'Incorrect UK VAT Number',
+            badStrength : 'The password isn\'t strong enough'
         }
     }
 

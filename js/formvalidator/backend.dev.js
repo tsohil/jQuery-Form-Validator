@@ -50,7 +50,6 @@ $.formUtils.addValidator({
             data : 'validate='+val,
             dataType : 'json',
             success : function(json) {
-                $form.removeClass('validating-backend');
 
                 if(json.success) {
                     $el.attr('data-backend-valid', 'true');
@@ -61,13 +60,16 @@ $.formUtils.addValidator({
                         $el.attr('data-error-message', json.message);
                 }
 
-                $form.bind('submit', oldSubmitEvent);
+                $form
+                    .removeClass('validating-backend')
+                    .unbind('submit')
+                    .bind('submit', oldSubmitEvent);
+
                 $el
                 .unbind('keyup')
                 .unbind('keydown')
-                .unbind('keypress');
-
-                $el.bind('keyup', function() {
+                .unbind('keypress')
+                .bind('keyup', function() {
                     $(this)
                         .removeAttr('data-backend-valid')
                         .removeAttr('data-backend-invalid');

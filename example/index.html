@@ -24,14 +24,22 @@
     <style>
         * {
             font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
-            color: #575757;
+            color: #555;
+            font-size: 11pt;
+            margin:0;
+            padding: 0;
         }
 
         body {
             background:#F2F2F2;
         }
 
-        #page-container {
+        #header {
+            background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#F2F2F2));
+            background-image: -moz-linear-gradient(top, #FFF,#F2F2F2);
+        }
+
+        .page-container {
             margin:0 auto;
             max-width: 980px;
             width:90%;
@@ -39,10 +47,10 @@
 
         #content-wrapper {
             background: #FFF;
-            border:#DDD solid 4px;
+            border:#F2F2F2 solid 5px;
             position:relative;
             min-height: 300px;
-            box-shadow: rgba(0, 0, 0, .05) 1px 1px 5px 2px;
+            box-shadow: rgba(0, 0, 0, .03) 1px 1px 10px 4px;
         }
 
         #content {
@@ -58,14 +66,24 @@
             right: 0;
         }
 
+        #header h1 {
+            font-size: 20pt;
+            padding: 30px 12px 12px;
+            text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
+        }
+
     </style>
 
 </head>
 <body>
 
-    <div id="page-container">
+    <div id="header">
+        <div class="page-container">
+            <h1>jQuery Form Validator v2.0</h1>
+        </div>
+    </div>
 
-        <h1>jQuery Form Validator v2.0</h1>
+    <div class="page-container">
 
         <div id="content-wrapper">
             <div id="content">
