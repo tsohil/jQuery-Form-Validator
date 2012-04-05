@@ -6,7 +6,8 @@
 *
 * Dual licensed under the MIT or GPL Version 2 licenses
 *
-* $version 1.3
+* $version 2.0.beta
+* $stable 1.3
 */
 (function($) {
     $.extend($.fn, {
@@ -114,7 +115,11 @@
                 $element.css('border-color', jQueryFormUtils.defaultBorderColor);
             }
 
-            var validation = jQueryFormUtils.validateInput($element, language, config);
+            var $form = $element.parent();
+            while($form.get(0).nodeName.toLowerCase() != 'form')
+                $form = $form.parent();
+
+            var validation = jQueryFormUtils.validateInput($element, language, config, $form);
 
             if(validation === true) {
                 $element.unbind('keyup');
@@ -451,7 +456,7 @@ jQueryFormUtils.addValidator({
         return true;
     },
     errorMessage : '',
-    errorMessageKey: ''
+    errorMessageKey: 'badDomain'
 });
 
 /*
@@ -508,6 +513,7 @@ jQueryFormUtils.addValidator({
 jQueryFormUtils.addValidator({
     name : 'validate_length',
     validate : function(value, $el, config, language) {
+        var validationRules = $el.attr(config.validationRuleAttribute);
         var lengthRange = jQueryFormUtils.getAttributeInteger(validationRules, 'length');
         var range = lengthRange.split('-');
         if (value.length < parseInt(range[0],10) || value.length > parseInt(range[1],10)) {
@@ -524,10 +530,10 @@ jQueryFormUtils.addValidator({
  * Validate confirmation
  */
 jQueryFormUtils.addValidator({
-    name : 'validate_length',
-    validate : function(value, $el, config, language, form) {
+    name : 'validate_confirmation',
+    validate : function(value, $el, config, language, $form) {
         var conf = '';
-        var confInput = form.find('input[name=' + $el.attr('name') + '_confirmation]').eq(0);
+        var confInput = $form.find('input[name=' + $el.attr('name') + '_confirmation]').eq(0);
         if (confInput) {
             conf = confInput.val();
         }
@@ -582,6 +588,20 @@ jQueryFormUtils.addValidator({
     },
     errorMessage : '',
     errorMessageKey: 'badInt'
+});
+
+/*
+ * Validate against regexp
+ */
+jQueryFormUtils.addValidator({
+    name : 'validate_custom',
+    validate : function(val, $el, config) {
+        var attr = $el.attr(config.validationRuleAttribute);
+        var regexp = new RegExp(attr.split('regexp/')[1].split('/')[0]);
+        return regexp.test(val);
+    },
+    errorMessage : '',
+    errorMessageKey: 'badCustomVal'
 });
 
 /*
@@ -670,19 +690,41 @@ jQueryFormUtils.addValidator({
 });
 
 /*
+ * Validate date
+ */
+jQueryFormUtils.addValidator({
+    name : 'validate_date',
+    validate : function(date, $el, conf) {
+        var dateFormat = 'yyyy-mm-dd';
+        if($el.attr('data-format')) {
+            dateFormat = $el.attr('data-format');
+        }
+        else if(typeof conf.dateFormat != 'undefined') {
+            dateFormat = conf.dateFormat;
+        }
+
+        return jQueryFormUtils.parseDate(date, dateFormat) !== false;
+    },
+    errorMessage : '',
+    errorMessageKey: 'badDate'
+});
+
+
+/*
  * Is this a valid birth date
  */
 jQueryFormUtils.addValidator({
     name : 'validate_birthdate',
     validate : function(val, $el, conf) {
         var dateFormat = 'yyyy-mm-dd';
-        if(typeof conf.dateFormat != 'undefined') {
-            dateFormat = conf.dateFormat;
-        } else if($el.attr('data-format')) {
+        if($el.attr('data-format')) {
             dateFormat = $el.attr('data-format');
         }
+        else if(typeof conf.dateFormat != 'undefined') {
+            dateFormat = conf.dateFormat;
+        }
 
-        var inputDate = this.parseDate(val, dateFormat);
+        var inputDate = jQueryFormUtils.parseDate(val, dateFormat);
         if (!inputDate) {
             return false;
         }
@@ -791,7 +833,7 @@ jQueryFormUtils.addValidator({
 jQueryFormUtils.addValidator({
     name : 'validate_swemobile',
     validate : function(number) {
-        if (!jQueryFormUtils.validatePhoneNumber(number)) {
+        if (!jQueryFormUtils.validators.validate_phone.validate(number)) {
             return false;
         }
 
@@ -914,26 +956,26 @@ jQueryFormUtils.getAttributeInteger = function(attrValue, attrName) {
 };
 
 /**
- * Validate the value of given element according to the validation rule
- * defined in attribute with given name. Will return true if valid,
+ * Validate the value of given element according to the validation rules
+ * found in the attribute data-validation. Will return true if valid,
  * error message otherwise
  *
- * @param {jQuery} el
+ * @param {jQuery} $el
  * @param {Object} language (jQueryFormUtils.LANG)
- * @param {String} validationRuleAttr
- * @param {jQuery} form
+ * @param {Object} config
+ * @param {jQuery} $form
  * @return {String}|{Boolean}
  */
-jQueryFormUtils.validateInput = function(el, language, config, form) {
-    var value = jQuery.trim(el.val());
-    var validationRules = el.attr(config.validationRuleAttribute);
+jQueryFormUtils.validateInput = function($el, language, config, $form) {
+    var value = jQuery.trim($el.val());
+    var validationRules = $el.attr(config.validationRuleAttribute);
 
     if (typeof validationRules != 'undefined' && validationRules !== null) {
         var posRules = validationRules.split(' ');
         for(var i=0; i < posRules.length; i++) {
             var validator = jQueryFormUtils.validators[posRules[i]];
             if(typeof validator != 'undefined') {
-                var isValid = validator.validate(value, el, config, language, form);
+                var isValid = validator.validate(value, $el, config, language, $form);
                 if(!isValid) {
                     var mess = jQueryFormUtils.LANG[validator.errorMessageKey];
                     if(typeof mess == 'undefined')
