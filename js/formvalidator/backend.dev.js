@@ -1,3 +1,7 @@
+/**
+ * Module that makes it possible to let backend validate
+ * the value of an input (eg. e-mail address not being registered already)
+ */
 $.formUtils.addValidator({
     oldKeyupEvent : false,
     name:'validate_backend',
@@ -23,7 +27,7 @@ $.formUtils.addValidator({
         .bind('keydown', disableElement)
         .bind('keypress', disableElement);
 
-        alert(oldSubmitEvent);
+       // alert(oldSubmitEvent);
 
         $form
             .unbind('submit')
@@ -46,6 +50,8 @@ $.formUtils.addValidator({
             data : 'validate='+val,
             dataType : 'json',
             success : function(json) {
+                $form.removeClass('validating-backend');
+
                 if(json.success) {
                     $el.attr('data-backend-valid', 'true');
                 }
@@ -75,6 +81,7 @@ $.formUtils.addValidator({
             }
         });
 
+        $.formUtils.haltValidation = true;
         return false;
     },
     errorMessage : '',
