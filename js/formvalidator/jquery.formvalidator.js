@@ -6,9 +6,8 @@
 *
 * Dual licensed under the MIT or GPL Version 2 licenses
 *
-* $version 2.0.beta
+* $version 2.0.beta (branch: modularization)
 * $stable 1.3
-* $requires jQuery version >= 1.5
 */
 (function($) {
     $.extend($.fn, {
@@ -763,23 +762,6 @@ $.formUtils.addValidator({
 });
 
 /*
-* Validate confirmation
-*/
-$.formUtils.addValidator({
-    name : 'validate_confirmation',
-    validate : function(value, $el, config, language, $form) {
-        var conf = '';
-        var confInput = $form.find('input[name=' + $el.attr('name') + '_confirmation]').eq(0);
-        if (confInput) {
-            conf = confInput.val();
-        }
-        return value === conf;
-    },
-    errorMessage : '',
-    errorMessageKey: 'notConfirmed'
-});
-
-/*
 * Validate url
 */
 $.formUtils.addValidator({
@@ -799,19 +781,6 @@ $.formUtils.addValidator({
     },
     errorMessage : '',
     errorMessageKey: 'badUrl'
-});
-
-/*
-* Simple spam check
-*/
-$.formUtils.addValidator({
-    name : 'validate_spamcheck',
-    validate : function(val, $el, config) {
-        var attr = $el.attr(config.validationRuleAttribute);
-        return attr.match(/captcha([0-9a-z]+)/i)[1].replace('captcha', '') === val;
-    },
-    errorMessage : '',
-    errorMessageKey: 'badSecurityAnswer'
 });
 
 /*
@@ -865,67 +834,6 @@ $.formUtils.addValidator({
 });
 
 /*
-* Validate time hh:mm
-*/
-$.formUtils.addValidator({
-    name : 'validate_time',
-    validate : function(time) {
-        if (time.match(/^(\d{2}):(\d{2})$/) === null) {
-            return false;
-        } else {
-            var hours = parseInt(time.split(':')[0],10);
-            var minutes = parseInt(time.split(':')[1],10);
-            if((hours > 24 || minutes > 59) || (hours === 24 && minutes > 0)) {
-                return false;
-            }
-        }
-        return true;
-    },
-    errorMessage : '',
-    errorMessageKey: 'badTime'
-});
-
-/*
-* Validate swedish social security number yyyymmddXXXX
-*/
-$.formUtils.addValidator({
-    name : 'validate_swesc',
-    validate : function(securityNumber) {
-        if (!securityNumber.match(/^(\d{4})(\d{2})(\d{2})(\d{4})$/)) {
-            return false;
-        }
-
-        var year = RegExp.$1;
-        var month = $.formUtils.parseDateInt(RegExp.$2);
-        var day = $.formUtils.parseDateInt(RegExp.$3);
-
-        // var gender = parseInt( (RegExp.$4) .substring(2,3)) % 2; ==> 1 === male && 0 === female
-
-        var months = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
-        if (year % 400 === 0 || year % 4 === 0 && year % 100 !== 0) {
-            months[1] = 29;
-        }
-        if (month < 1 || month > 12 || day < 1 || day > months[month - 1]) {
-            return false;
-        }
-
-        securityNumber = securityNumber.substring(2, securityNumber.length);
-        var check = '';
-        for (var i = 0; i < securityNumber.length; i++) {
-            check += ((((i + 1) % 2) + 1)* securityNumber.substring(i, i + 1));
-        }
-        var checksum = 0;
-        for (i = 0; i < check.length; i++) {
-            checksum += parseInt(check.substring(i, i + 1),10);
-        }
-
-        return checksum % 10 === 0;
-    },
-    errorMessage : '',
-    errorMessageKey: 'badSecurityNumber'
-});
-
-/*
 * Validate date
 */
 $.formUtils.addValidator({
@@ -940,50 +848,6 @@ $.formUtils.addValidator({
         }
 
         return $.formUtils.parseDate(date, dateFormat) !== false;
-    },
-    errorMessage : '',
-    errorMessageKey: 'badDate'
-});
-
-
-/*
-* Is this a valid birth date
-*/
-$.formUtils.addValidator({
-    name : 'validate_birthdate',
-    validate : function(val, $el, conf) {
-        var dateFormat = 'yyyy-mm-dd';
-        if($el.attr('data-format')) {
-            dateFormat = $el.attr('data-format');
-        }
-        else if(typeof conf.dateFormat != 'undefined') {
-            dateFormat = conf.dateFormat;
-        }
-
-        var inputDate = $.formUtils.parseDate(val, dateFormat);
-        if (!inputDate) {
-            return false;
-        }
-
-        var d = new Date();
-        var currentYear = d.getFullYear();
-        var year = inputDate[0];
-        var month = inputDate[1];
-        var day = inputDate[2];
-
-        if (year === currentYear) {
-            var currentMonth = d.getMonth() + 1;
-            if (month === currentMonth) {
-                var currentDay = d.getDate();
-                return day <= currentDay;
-            }
-            else {
-                return month < currentMonth;
-            }
-        }
-        else {
-            return year < currentYear && year > (currentYear - 124); // we can not live for ever yet...
-        }
     },
     errorMessage : '',
     errorMessageKey: 'badDate'
@@ -1061,30 +925,6 @@ $.formUtils.addValidator({
     },
     errorMessage : '',
     errorMessageKey: 'badUKVatAnswer'
-});
-
-/*
-* Validate that string is a swedish telephone number
-*/
-$.formUtils.addValidator({
-    name : 'validate_swemobile',
-    validate : function(number) {
-        if (!$.formUtils.validators.validate_phone.validate(number)) {
-            return false;
-        }
-
-        number = number.replace(/[^0-9]/g, '');
-        var begin = number.substring(0, 3);
-
-        if (number.length != 10 && begin !== '467') {
-            return false;
-        } else if (number.length != 11 && begin === '467') {
-            return false;
-        }
-        return (/07[0-9{1}]/).test(begin) || (begin === '467' && number.substr(3, 1) === '0');
-    },
-    errorMessage : '',
-    errorMessageKey: 'badTelephone'
 });
 
 /*
