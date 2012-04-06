@@ -39,7 +39,7 @@ $.formUtils.addValidator({
         if(requiredStrength > 2)
             requiredStrength = 2;
 
-        return parseInt(val) >= requiredStrength;
+        return $.formUtils.validators.validate_strength.calculatePasswordStrength(val) >= requiredStrength;
     },
     errorMessage : '',
     errorMessageKey: 'badStrength',
@@ -130,68 +130,65 @@ $.formUtils.addValidator({
             score = 100;
         }
 
-        // score < 34 == bad
-        // score 34 >< 68 == okey
-        // score > 68 == great
-
         if (score < 34) {
             return 0;
         }
         else if (score < 68) {
             return 1;
         }
-        else
+        else {
             return 2;
+        }
     },
 
     strengthDisplay : function($el, options) {
-        var self = this;
         var config = {
             fontSize: '12pt',
-            padding: '10px',
-            weak : 'To weak',
+            padding: '4px',
+            weak : 'Weak',
             good : 'Good',
             strong : 'Strong'
         };
-        
+
         if (options) {
             $.extend(config, options);
         }
 
         $el.bind('keyup', function() {
-            var $parent = $(this).parent();
+            var $parent = typeof config.parent == 'undefined' ? $(this).parent() : $(config.parent);
             var $displayContainer = $parent.find('.strength-meter');
             if($displayContainer.length == 0) {
-                $displayContainer = $('<div></div>');
+                $displayContainer = $('<span></span>');
                 $displayContainer
                     .addClass('strength-meter')
                     .appendTo($parent);
             }
 
-            var strength = self.calculatePasswordStrength($(this).val());
+            var strength = $.formUtils.validators.validate_strength.calculatePasswordStrength($(this).val());
             var css = {
                 background: 'pink',
                 color : '#FF0000',
                 fontWeight : 'bold',
-                border : 'red solid 0px 0px 2px',
+                border : 'red solid 1px',
+                borderWidth : '0px 0px 4px',
                 display : 'inline-block',
-                fontSize : conf.fontSize,
-                padding : conf.padding
+                fontSize : config.fontSize,
+                padding : config.padding
             };
 
-            var text = conf.weak;
+            var text = config.weak;
 
-            if(strength == 2) {
+            if(strength == 1) {
                 css.background = 'lightyellow';
                 css.borderColor = 'yellow';
                 css.color = 'goldenrod';
-                text = conf.good;
+                text = config.good;
             }
-            else if(strength == 1) {
+            else if(strength == 2) {
                 css.background = 'lightgreen';
                 css.borderColor = 'darkgreen';
                 css.color = 'darkgreen';
-                text = conf.strong;
+                text = config.strong;
             }
 
             $displayContainer
@@ -210,5 +207,5 @@ $.formUtils.addValidator({
             new $.formUtils.validators.validate_strength.strengthDisplay($(this), conf);
             return this;
         }
-    })
+    });
 })(jQuery);

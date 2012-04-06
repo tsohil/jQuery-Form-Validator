@@ -1,6 +1,7 @@
 /**
  * Module that makes it possible to let backend validate
- * the value of an input (eg. e-mail address not being registered already)
+ * the value of an input (eg. check that e-mail address not
+ * already registered)
  */
 $.formUtils.addValidator({
     oldKeyupEvent : false,

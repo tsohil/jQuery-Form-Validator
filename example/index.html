@@ -5,9 +5,11 @@
     <title>jQuery Form Validator v2.0</title>
 
     <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-    <script type="text/javascript" src="../jquery.js"></script>
-    <script type="text/javascript" src="../js/formvalidator/jquery.formvalidator.js"></script>
+    <script src="../jquery.js"></script>
+    <script src="../js/formvalidator/jquery.formvalidator.js"></script>
+    <script src="prettify.js"></script>
 
     <script>
 
@@ -19,60 +21,29 @@
             });
             return false;
         };
+
+        var toggleSource = function(id, link) {
+            var $code = $('#'+id);
+            var $link = $(link);
+            if($code.is(':visible')) {
+                $link.text('View source');
+                $code.hide('slide');
+            }
+            else {
+                $link.text('Hide source');
+                $code.show('slide');
+            }
+
+            return false;
+        };
+
+        $(prettyPrint);
+
     </script>
 
-    <style>
-        * {
-            font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
-            color: #555;
-            font-size: 11pt;
-            margin:0;
-            padding: 0;
-        }
-
-        body {
-            background:#F2F2F2;
-        }
-
-        #header {
-            background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#F2F2F2));
-            background-image: -moz-linear-gradient(top, #FFF,#F2F2F2);
-        }
-
-        .page-container {
-            margin:0 auto;
-            max-width: 980px;
-            width:90%;
-        }
-
-        #content-wrapper {
-            background: #FFF;
-            border:#F2F2F2 solid 5px;
-            position:relative;
-            min-height: 300px;
-            box-shadow: rgba(0, 0, 0, .03) 1px 1px 10px 4px;
-        }
-
-        #content {
-            padding: 12px 200px 12px 12px;
-        }
-
-        #side-column {
-            height: 200px;
-            background: yellow;
-            position: absolute;
-            width: 200px;
-            top: 0;
-            right: 0;
-        }
-
-        #header h1 {
-            font-size: 20pt;
-            padding: 30px 12px 12px;
-            text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
-        }
-
-    </style>
+    <link rel="stylesheet" href="css/prettify.css" type="text/css" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+    <link rel="stylesheet" href="css/formvalidator.css" type="text/css" />
 
 </head>
 <body>
@@ -87,8 +58,94 @@
 
         <div id="content-wrapper">
             <div id="content">
+                <p>
+                    This is a form validation (jQuery) plugin with a rich set of features. The goal of
+                    the plugin is to keep your html clean from javascript
+                    logic and at the same time being as light weight as possible.
+                </p>
                 <div id="home" class="page">
-                    <h1>Hejsan</h1>
+                    <h2>Module: security</h2>
+                    <form action="#" onsubmit="if($(this).validate()) alert('Valid!'); return false;">
+                        <div>
+                            <label for="pass">
+                                Password
+                            </label>
+                            <div>
+                                <input type="password" name="pass" id="pass" data-validation="validate_strength strength1 validate_confirmation" />
+                            </div>
+                            <script>
+                                $(function() {
+                                    $('#pass').displayPasswordStrength({fontSize: '10pt'});
+                                });
+                            </script>
+                        </div>
+                        <div>
+                            <label for="confirm_pass">
+                                Confirm password
+                            </label>
+                            <div>
+                                <input type="password" name="pass_confirmation" id="confirm_pass"  />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="captcha">
+                                What is the sum of 2+6
+                            </label>
+                            <div>
+                                <input type="text" size="10" name="captcha" id="captcha" data-validation="validate_spamcheck captcha8" />
+                            </div>
+                        </div>
+                        <div>
+                            <input type="submit" class="button" name="send" value="Post" />
+                            (<a href="#" onclick="return toggleSource('code-security', this);">View source</a>)
+                        </div>
+                    </form>
+                    <pre class="prettyprint lang-html" id="code-security" style="display: none;">
+&lt;?php
+session_start();
+if( isset($_POST[&#039;captcha&#039;]) &amp;&amp; isset($_SESSION[&#039;captcha&#039;])) {
+  if($_POST[&#039;captcha&#039;] != ($_SESSION[&#039;captcha&#039;][0]+$_SESSION[&#039;captcha&#039;][1]))
+    die(&#039;Invalid captcha answer&#039;);  // client does not have javascript enabled
+}
+
+$_SESSION[&#039;captcha&#039;] = array( mt_rand(0,9), mt_rand(1, 9) );
+
+?&gt;&lt;html&gt;
+&lt;head&gt;
+    &lt;script src=&quot;js/formvalidator/jquery.formvalidator.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script&gt;
+        $.formUtils.loadModules(&#039;security&#039;);
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;form action=&quot;&quot; onsubmit=&quot;return $(this).validate();&quot;&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;pass&quot;&gt;Password&lt;/label&gt;
+        &lt;input type=&quot;password&quot; name=&quot;pass&quot; id=&quot;pass&quot;
+                    data-validation=&quot;validate_strength strength1 validate_confirmation&quot; /&gt;
+        &lt;script&gt;
+            $(function() {
+                $(&#039;#pass&#039;).displayPasswordStrength();
+            });
+        &lt;/script&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;confirm_pass&quot;&gt;Confirm password&lt;/label&gt;
+        &lt;input type=&quot;password&quot; name=&quot;pass_confirmation&quot; id=&quot;confirm_pass&quot;  /&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;cap&quot;&gt;
+            What is the sum of &lt;?=$_SESSION[&#039;captcha&#039;][0]?&gt; + &lt;?=$_SESSION[&#039;captcha&#039;][1]?&gt;?
+        &lt;/label&gt;
+        &lt;input type=&quot;text&quot; name=&quot;captcha&quot; id=&quot;cap&quot; data-validation=&quot;validate_spamcheck captcha8&quot; /&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;input type=&quot;submit&quot; class=&quot;button&quot; name=&quot;send&quot; value=&quot;Post&quot; /&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                    </pre>
                 </div>
             </div>
 

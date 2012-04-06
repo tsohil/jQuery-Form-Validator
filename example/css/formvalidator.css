@@ -1,0 +1,10 @@
+
+/*
+ Module: security
+ This class will be applied on the element displaying password strength
+*/
+.strength-meter {
+    margin-left: 5px;
+    border-radius: 4px;
+    border-bottom: 0px !important;
+}

@@ -392,6 +392,7 @@
                         url : scriptUrl,
                         cache : scriptUrl.substr(-7) != '.dev.js',
                         dataType : 'script',
+                        async : false,
                         error : function() {
                             throw new Error('Unable to load form validation module '+module);
                         }
@@ -673,6 +674,10 @@ $.formUtils.addValidator({
                             break;
                         }
                     }
+
+                    if(hasTopDomain)
+                        break;
+
                 } else {
                     hasTopDomain = true;
                     break;
