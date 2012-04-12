@@ -1,0 +1,192 @@
+$blue:
+
+* {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+    color: #555;
+    font-size: 10pt;
+    margin:0;
+    padding: 0;
+}
+
+body {
+    background:#F2F2F2;
+    cursor: default;
+}
+
+h1, h2, h3, h4 {
+    font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
+}
+
+p, h2, h3, h4 {
+    padding: 0 0 20px;
+    line-height: 150%;
+    cursor: text;
+}
+
+h2 {
+    font-size: 16pt;
+    border-bottom: #CCC solid 1px;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+a:link, a:visited {
+    cursor: pointer;
+}
+a:hover, a:active {
+    text-decoration: none;
+    color:#111;
+}
+
+h3 {
+    font-size: 13pt;
+}
+
+/*
+ STRUCTURE
+*/
+
+#header {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(#F2F2F2));
+    background-image: -moz-linear-gradient(top, #FFF,#F2F2F2);
+}
+
+    #header h1 {
+        font-size: 22pt;
+        padding: 30px 12px 12px;
+        text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
+    }
+
+.page-container {
+    margin:0 auto;
+    max-width: 800px;
+    width:90%;
+}
+
+#content-wrapper {
+    background: #FFF;
+    border:#F2F2F2 solid 5px;
+    position:relative;
+    min-height: 300px;
+    box-shadow: rgba(0, 0, 0, .03) 1px 1px 10px 4px;
+}
+
+#content {
+    padding: 20px 220px 20px 20px;
+}
+
+#side-column {
+    height: 200px;
+    position: absolute;
+    width: 200px;
+    top: 0;
+    right: 0;
+}
+
+    #navigation {
+        padding: 22px 20px;
+        list-style-type: none;
+    }
+
+    #navigation li {
+        overflow: auto;
+    }
+
+    #navigation a {
+        text-decoration: none;
+        display: block;
+        float: left;
+        padding: 3px;
+        background: #f5f5f5;
+        border-radius: 4px;
+    }
+
+    #navigation a.current {
+        background: #0996b9;
+        color: #fff !important;
+    }
+
+    #navigation a:hover {
+        color: #0996b9;
+    }
+
+    #navigation li {
+        padding:5px 10px;
+    }
+
+    #navigation li.sep {
+        padding: 12px 0 5px;
+        border-bottom: #CCC solid 1px;
+        margin-left: 12px;
+    }
+
+
+.page {
+    display: none;
+}
+
+/*
+ FORMS
+*/
+form {
+    display: block;
+}
+
+input, textarea {
+    padding: 6px;
+    width: 190px;
+    color: #777;
+    border: #DDD solid 1px;
+    border-radius: 4px;
+}
+
+form > div {
+    overflow: auto;
+}
+
+label {
+    font-size: 10pt;
+    display: block;
+    font-weight: bold;
+    float: left;
+    width: 47%;
+    max-width: 130px;
+    text-align: right;
+    padding: 14px 3% 0 0;
+}
+
+form div div {
+    float: left;
+    width: 50%;
+    padding: 10px 0 10px 0%;
+}
+
+.submit {
+    padding:18px 0;
+}
+
+.submit .button {
+    width:auto;
+    font-weight: bold;
+    padding: 6px 20px;
+    color:#111;
+    background: #F2F2F2;
+    text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
+    border: #EEE outset 2px;
+    margin-right: 3px;
+}
+
+
+/*
+  PRETTIFY MOD
+*/
+pre {
+    border:0 !important;
+    background:#F5F5F5;
+    padding-left: 8px !important;
+    margin-top: 12px;
+}
+
+pre > * {
+    font-size: 8pt;
+}

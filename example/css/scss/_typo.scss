@@ -1,0 +1,75 @@
+$blue: #0996b9;
+$padding: 12px;
+
+/* FONT MIXINS */
+
+@mixin font-base {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    line-height: 150%;
+    color: #555;
+}
+
+@mixin font-large {
+    font-family: "Helvetica Neue", HelveticaNeue, Helvetica, sans-serif;
+    font-size: 19pt;
+    color: #555;
+    font-weight: bold;
+}
+
+@mixin font-small {
+    font-size: 9pt;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@mixin graded($from, $to) {
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from($from), to($to));
+    background-image: -moz-linear-gradient(top, $from, $to);
+}
+
+@mixin rounded-corners($rounded-corner-radius) {
+    -webkit-border-radius: $rounded-corner-radius;
+    -moz-border-radius: $rounded-corner-radius;
+    -ms-border-radius: $rounded-corner-radius;
+    border-radius: $rounded-corner-radius;
+}
+
+* {
+    @include font-base;
+    margin:0;
+    padding: 0;
+}
+
+body {
+    background:#F2F2F2;
+    cursor: default;
+}
+
+h1, h2, h3, h4 {
+    @include font-large;
+}
+
+p, h2, h3, h4 {
+    @include font-base;
+    cursor: text;
+}
+
+h2 {
+    font-size: 16pt;
+    border-bottom: #CCC solid 1px;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+a:link, a:visited {
+    cursor: pointer;
+}
+a:hover, a:active {
+    text-decoration: none;
+    color:#111;
+}
+
+h3 {
+    font-size: 13pt;
+}
