@@ -33,7 +33,7 @@
         * Should be called on the element containing the input elements.
         * <input data-help="The info that I want to display for the user when input is focused" ... />
         *
-        * @param {String} attrName Optional, default is data-help
+        * @param {String} attrName - Optional, default is data-help
         * @return {jQuery}
         */
         showHelpOnFocus : function(attrName) {
@@ -223,33 +223,41 @@
             var $form = $(this);
 
             //
-            // Validate radio buttons
+            // Validate radio buttons and checkbox
             //
-            $form.find('input[type=radio]').each(function() {
-                var validationRule = $(this).attr(config.validationRuleAttribute);
+            $form.find('input[type=radio],input[type=checkbox]').each(function() {
+                var $el = $(this);
+                var isChecked = false;
+                var validationRule = $el.attr(config.validationRuleAttribute);
                 if (typeof validationRule != 'undefined' && validationRule === 'required') {
-                    var radioButtonName = $(this).attr('name');
-                    var isChecked = false;
-                    $form.find('input[name=' + radioButtonName + ']').each(function() {
-                        if ($(this).is(':checked')) {
-                            isChecked = true;
-                        }
-                    });
+                    if($el.attr('type') == 'checkbox') {
+                        isChecked = $el.is(':checked');
+                    }
+                    else {
+                        var radioButtonName = $el.attr('name');
+                        $form.find('input[name=' + radioButtonName + ']').each(function() {
+                            if ($(this).is(':checked')) {
+                                isChecked = true;
+                                return false;
+                            }
+                        });
+                    }
+
                     if (!isChecked) {
                         errorMessages.push(language.requiredFields);
-                        errorInputs.push($(this));
-                        $(this).attr('data-error', language.requiredFields);
+                        errorInputs.push($el);
+                        $el.attr('data-error', language.requiredFields);
                     }
                 }
             });
+
 
             //
             // Validate element values
             //
             $.formUtils.haltValidation = false;
-            var $elements = $form.find('input,textarea,select');
-            for(var i=0; i < $elements.length; i++) {
-                var $el = $elements.eq(i);
+            $form.find('input,textarea,select').each(function() {
+                var $el = $(this);
                 if (!ignoreInput($el.attr('name'), $el.attr('type'))) {
 
                     // memorize border color
@@ -271,7 +279,7 @@
                     }
                 }
 
-            }
+            });
 
             //
             // Reset style and remove error class
@@ -290,7 +298,7 @@
             //
             // Validation failed
             //
-            if (errorInputs.length > 0) {
+            if (!$.formUtils.haltValidation && errorInputs.length > 0) {
 
                 // Apply error style to invalid inputs
                 for (var i = 0; i < errorInputs.length; i++) {
@@ -460,7 +468,7 @@
         },
 
        /**
-        * <input data-validation="length12" /> => getAttribute($(element).attr('class'), 'length') = 12
+        * <input data-validation="validate_min_length length12" /> => getAttribute($(element).attr('data-validation'), 'length') = 12
         * @param {String} attrValue
         * @param {String} attrName
         * @returns integer
@@ -556,7 +564,11 @@
                     var $el = $(this);
                     var val = $el.val();
                     $el.val(val.substring(0, self.maxLength));
-                    maxLengthElement.text(self.maxLength - val.length);
+                    var left = self.maxLength - val.length;
+                    if(left < 0)
+                        left = 0;
+
+                    maxLengthElement.text(left);
                 })
                 .focus(function() {
                     $(this).keyup();
@@ -718,8 +730,8 @@ $.formUtils.addValidator({
     validate : function(val) {
         return val !== '';
     },
-    errorMessage : 'requiredFields',
-    errorMessageKey: ''
+    errorMessage : '',
+    errorMessageKey: 'requiredFields'
 });
 
 /*

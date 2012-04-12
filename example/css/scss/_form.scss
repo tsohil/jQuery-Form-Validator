@@ -1,47 +1,77 @@
 form {
     display: block;
+    overflow: auto;
 }
 
 input, textarea {
-    padding: 6px;
+    padding: 8px 6px;
     width: 190px;
     color: #777;
     border: #DDD solid 1px;
-    border-radius: 4px;
+    @include rounded-corners(4px);
 }
 
 form > div {
     overflow: auto;
+
+    label {
+        font-size: 10pt;
+        display: block;
+        font-weight: bold;
+        float: left;
+        width: 47%;
+        max-width: 130px;
+        text-align: right;
+        padding: 14px 3% 0 0;
+    }
+
+    div {
+        float: left;
+        width: 50%;
+        padding: 10px 0 10px 0%;
+
+        .jquery_form_error_message {
+            display: block;
+            background: none;
+            padding: 0;
+            font-size: 8pt;
+            margin:0;
+            line-height: 150%;
+        }
+    }
 }
 
-label {
-    font-size: 10pt;
-    display: block;
-    font-weight: bold;
-    float: left;
-    width: 47%;
-    max-width: 130px;
-    text-align: right;
-    padding: 14px 3% 0 0;
+form.inline {
+
+    div, label {
+        float: left;
+        width: auto;
+        padding: 0 10px 0 0;
+    }
+
+    label {
+        line-height: 240%;
+    }
 }
 
-form div div {
-    float: left;
-    width: 50%;
-    padding: 10px 0 10px 0%;
+form.inline > div {
+    padding-top: 10px;
 }
 
 .submit {
     padding:18px 0;
-}
 
-.submit .button {
-    width:auto;
-    font-weight: bold;
-    padding: 6px 20px;
-    color:#111;
-    background: #F2F2F2;
-    text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
-    border: #EEE outset 2px;
-    margin-right: 3px;
+    .button {
+        width:auto;
+        font-weight: bold;
+        padding: 6px 20px;
+        color:#111;
+        text-shadow: rgba(255, 255, 255, 1) 0 1px 0;
+        border: #EEE outset 2px;
+        margin-right: 3px;
+        font-size: 10pt;
+        cursor: pointer;
+        @include rounded-corners(4px);
+        @include graded(#F2F2F2, #E2E2E2);
+    }
 }

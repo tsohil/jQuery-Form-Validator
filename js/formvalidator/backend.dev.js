@@ -5,6 +5,7 @@
  */
 $.formUtils.addValidator({
     oldKeyupEvent : false,
+    oldSubmitEvent : false,
     name:'validate_backend',
     validate : function(val, $el, conf, lang, $form) {
         if($el.attr('data-backend-valid'))
@@ -12,28 +13,26 @@ $.formUtils.addValidator({
         else if($el.attr('data-backend-invalid'))
             return false;
 
-        var oldSubmitEvent = $form.get(0).onsubmit;
-        if(this.oldKeyupEvent === false)
-            var oldElementKeyupEvent = $el.get(0).keyup;
+        var self = this;
 
-        var disableElement = function(e) {
-            if('preventDefault' in e)
-                e.preventDefault();
-
-            return false;
-        };
-
-        $el
-        .bind('keyup', disableElement)
-        .bind('keydown', disableElement)
-        .bind('keypress', disableElement);
-
-       // alert(oldSubmitEvent);
+        if(this.oldSubmitEvent === false) {
+            this.oldKeyupEvent = $el.get(0).keyup;
+            this.oldSubmitEvent = $form.get(0).onsubmit;
+            if(!this.oldSubmitEvent) {
+                $.each($form.data('events').submit, function(k, func) {
+                    self.oldSubmitEvent = func.handler;
+                    return false;
+                });
+                $form.unbind('submit');
+            }
+        }
 
         $form
             .unbind('submit')
-            .bind('submit', disableElement)
-            .addClass('validating-backend');
+            .addClass('validating-backend')
+            .get(0).onsubmit = function() {
+                return false;
+            };
 
         var backendUrl = document.location.href;
 
@@ -43,7 +42,6 @@ $.formUtils.addValidator({
             backendUrl = conf.backendUrl;
         }
 
-        var self = this;
         $.ajax({
             url : backendUrl,
             type : 'POST',
@@ -51,7 +49,6 @@ $.formUtils.addValidator({
             data : 'validate='+val,
             dataType : 'json',
             success : function(json) {
-
                 if(json.success) {
                     $el.attr('data-backend-valid', 'true');
                 }
@@ -59,28 +56,29 @@ $.formUtils.addValidator({
                     $el.attr('data-backend-invalid', 'true');
                     if(json.message)
                         $el.attr('data-error-message', json.message);
+                    else
+                        $el.removeAttr('data-error-message');
                 }
 
                 $form
                     .removeClass('validating-backend')
-                    .unbind('submit')
-                    .bind('submit', oldSubmitEvent);
+                    .get(0).onsubmit = function() {};
+
+                $form.bind('submit', self.oldSubmitEvent);
 
                 $el
-                .unbind('keyup')
-                .unbind('keydown')
-                .unbind('keypress')
                 .bind('keyup', function() {
                     $(this)
                         .removeAttr('data-backend-valid')
-                        .removeAttr('data-backend-invalid');
+                        .removeAttr('data-backend-invalid')
+                        .removeAttr('data-error-message');
 
                     if(self.oldKeyupEvent == 'function')
                         self.oldKeyupEvent();
                 });
 
                 // fire submission again!
-                $form.get(0).submit();
+                $form.trigger('submit');
             }
         });
 

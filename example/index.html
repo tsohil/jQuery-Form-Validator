@@ -15,12 +15,7 @@
 
         $.formUtils.loadModules('date.dev, security.dev, sweden.dev, backend.dev, ukvat.dev');
 
-        var showPage = function(p) {
-            $('.page:visible').fadeOut('fast', function() {
-                $('#'+p).fadeIn('fast');
-            });
-            return false;
-        };
+        $(prettyPrint);
 
         var toggleSource = function(id, link) {
             var $code = $('#'+id);
@@ -37,7 +32,19 @@
             return false;
         };
 
-        $(prettyPrint);
+        var showPage = function(p) {
+            $('.page:visible').fadeOut('fast', function() {
+                $('#'+p).fadeIn('fast');
+            });
+            $('#navigation a').removeClass('current');
+            $('#navigation a[data-page='+p+']').addClass('current');
+            return false;
+        };
+
+        $('#navigation a').live('click', function() {
+            showPage($(this).attr('data-page'));
+            return false;
+        });
 
     </script>
 
@@ -63,7 +70,10 @@
                     the plugin is to keep your html clean from javascript
                     logic and at the same time being as light weight as possible.
                 </p>
-                <div id="home" class="page">
+                <div id="home" style="display: block;" class="page">
+                    hejsan
+                </div>
+                <div id="mod-security" class="page">
                     <h2>Module: security</h2>
                     <form action="#" onsubmit="if($(this).validate()) alert('Valid!'); return false;">
                         <div>
@@ -95,8 +105,8 @@
                                 <input type="text" size="10" name="captcha" id="captcha" data-validation="validate_spamcheck captcha8" />
                             </div>
                         </div>
-                        <div>
-                            <input type="submit" class="button" name="send" value="Post" />
+                        <div class="submit">
+                            <input type="submit" class="button" name="send" value="Send form" />
                             (<a href="#" onclick="return toggleSource('code-security', this);">View source</a>)
                         </div>
                     </form>
@@ -109,6 +119,7 @@ if( isset($_POST[&#039;captcha&#039;]) &amp;&amp; isset($_SESSION[&#039;captcha&
 }
 
 $_SESSION[&#039;captcha&#039;] = array( mt_rand(0,9), mt_rand(1, 9) );
+$captcha = $_SESSION[&#039;captcha&#039;][0] + $_SESSION[&#039;captcha&#039;][1];
 
 ?&gt;&lt;html&gt;
 &lt;head&gt;
@@ -122,7 +133,7 @@ $_SESSION[&#039;captcha&#039;] = array( mt_rand(0,9), mt_rand(1, 9) );
     &lt;div&gt;
         &lt;label for=&quot;pass&quot;&gt;Password&lt;/label&gt;
         &lt;input type=&quot;password&quot; name=&quot;pass&quot; id=&quot;pass&quot;
-                    data-validation=&quot;validate_strength strength1 validate_confirmation&quot; /&gt;
+            data-validation=&quot;validate_strength strength1 validate_confirmation&quot; /&gt;
         &lt;script&gt;
             $(function() {
                 $(&#039;#pass&#039;).displayPasswordStrength();
@@ -135,9 +146,11 @@ $_SESSION[&#039;captcha&#039;] = array( mt_rand(0,9), mt_rand(1, 9) );
     &lt;/div&gt;
     &lt;div&gt;
         &lt;label for=&quot;cap&quot;&gt;
-            What is the sum of &lt;?=$_SESSION[&#039;captcha&#039;][0]?&gt; + &lt;?=$_SESSION[&#039;captcha&#039;][1]?&gt;?
+            What is the sum of
+            &lt;?=$_SESSION[&#039;captcha&#039;][0]?&gt; + &lt;?=$_SESSION[&#039;captcha&#039;][1]?&gt;?
         &lt;/label&gt;
-        &lt;input type=&quot;text&quot; name=&quot;captcha&quot; id=&quot;cap&quot; data-validation=&quot;validate_spamcheck captcha8&quot; /&gt;
+        &lt;input type=&quot;text&quot; name=&quot;captcha&quot; id=&quot;cap&quot;
+                data-validation=&quot;validate_spamcheck captcha&lt;?=$captcha?&gt;&quot; /&gt;
     &lt;/div&gt;
     &lt;div&gt;
         &lt;input type=&quot;submit&quot; class=&quot;button&quot; name=&quot;send&quot; value=&quot;Post&quot; /&gt;
@@ -147,14 +160,320 @@ $_SESSION[&#039;captcha&#039;] = array( mt_rand(0,9), mt_rand(1, 9) );
 &lt;/html&gt;
                     </pre>
                 </div>
+                <div id="mod-backend" class="page">
+                    <h2>Module: backend</h2>
+                    <form action="" class="inline" onsubmit="if($(this).validate()) alert('Valid!'); return false;">
+                        <div>
+                            <label for="pass">
+                                E-mail
+                            </label>
+                            <div>
+                                <input type="email" name="pass" data-validation="validate_backend" data-backend-url="validate-email.php" />
+                            </div>
+                        </div>
+                        <div class="submit">
+                            <input type="submit" name="send" value="Send form" class="button" />
+                            (<a href="#" onclick="return toggleSource('code-backend', this);">View source</a>)
+                        </div>
+                    </form>
+                    <div id="code-backend" class="code-wrapper" style="display: none">
+                        <h4>Form example</h4>
+                        <pre class="prettyprint lang-html">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;script src=&quot;js/formvalidator/jquery.formvalidator.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script&gt;
+        $.formUtils.loadModules(&#039;backend&#039;);
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;form action=&quot;&quot; onsubmit=&quot;return $(this).validate();&quot;&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;email&quot;&gt;E-mail&lt;/label&gt;
+        &lt;input type=&quot;email&quot; name=&quot;email&quot; id=&quot;email&quot;
+        data-validation=&quot;validate_backend&quot; data-backend-url=&quot;check.php&quot; /&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;input type=&quot;submit&quot; class=&quot;button&quot; name=&quot;send&quot; value=&quot;Post&quot; /&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                        </pre>
+
+                        <h4>check.php</h4>
+                        <pre class="prettyprint lang-php">
+&lt;?php
+$json = array();
+
+if(count($_POST) == 0)
+    $json[&#039;message&#039;] = &#039;No data posted&#039;;
+
+elseif(empty($_POST[&#039;validate&#039;]))
+    $json[&#039;message&#039;] = &#039;Validate argument was empty&#039;;
+
+else {
+    $user_model = new User_Model();
+    if($user_model-&gt;loadUserByEmail($_POST[&#039;validate&#039;]))
+        $json[&#039;message&#039;] = &#039;E-mail address already registered&#039;;
+    else
+        $json[&#039;success&#039;] = true;
+}
+
+header(&#039;Content-Type: application/json&#039;);
+echo json_encode($json);
+                        </pre>
+                    </div>
+                </div>
+                <div id="page-example" class="page">
+                    <h2>User registration example</h2>
+                    <form action="" id="user-registration">
+                        <div>
+                            <label for="username">
+                                User name
+                            </label>
+                            <div>
+                                <input id="username"
+                                       data-validation="validate_length length4-20
+                                       validate_custom regexp/^[a-zA-Z0-9]+$/" data-help="4-20 characters, only a-z and numbers" />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="email2">
+                                E-mail
+                            </label>
+                            <div>
+                                <input type="email" id="email2"
+                                       data-validation="validate_email validate_backend" data-backend-url="validate-email.php" />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="pass2">
+                                Password
+                            </label>
+                            <div>
+                                <input type="password" name="pass" id="pass2"
+                                       data-validation="validate_strength strength1 validate_confirmation" />
+                            </div>
+                            <script>
+                                $(function() {
+                                    $('#pass2').displayPasswordStrength();
+                                });
+                            </script>
+                        </div>
+                        <div>
+                            <label for="cpass">
+                                Confirm password
+                            </label>
+                            <div>
+                                <input type="password" name="pass_confirmation" id="cpass" />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="birth2">
+                                Birthday
+                            </label>
+                            <div>
+                                <input id="birth2" data-validation="validate_birthdate" data-help="dd/mm/yyyy" />
+                            </div>
+                        </div>
+                        <div>
+                            <label for="sex">
+                                Gender
+                            </label>
+                            <div>
+                                <select id="sex" data-validation="required">
+                                    <option value="">- - Gender - -</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="pres">
+                                Presentation<br />
+                                <span style="font-weight: normal">
+                                    <span id="max-pres-length">100</span>
+                                    characters left
+                                </span>
+                            </label>
+                            <div>
+                                <textarea id="pres" rows="5"></textarea>
+                            </div>
+                            <script>
+                                $('#pres').restrictLength($('#max-pres-length'));
+                            </script>
+                        </div>
+                        <div>
+                            <label for="agreement">
+                                Please check this box
+                                to confirm that you
+                                agree with our <a href="#">license</a>
+                            </label>
+                            <div>
+                                <input type="checkbox" id="agreement" value="1" name="license" data-validation="required" />
+                            </div>
+                        </div>
+                        <div class="submit">
+                            <input type="submit" class="button" value="Register" />
+                            (<a href="#" onclick="return toggleSource('code-example-registration', this)">View source</a> )
+                        </div>
+                    </form>
+                    <script>
+                        $('#user-registration')
+                            .showHelpOnFocus()
+                            .submit(function() {
+                                var options = {
+                                    errorMessagePosition : 'element',
+                                    dateFormat : 'dd/mm/yyyy'
+                                };
+
+                                if($(this).validate(false, options))
+                                    alert('Valid!');
+
+                                return false;
+                            });
+                    </script>
+                    <pre id="code-example-registration" class="prettyprint lang-html" style="display: none">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;script src=&quot;js/formvalidator/jquery.formvalidator.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script&gt;
+        $.formUtils.loadModules(&#039;backend&#039;, &#039;date&#039;, &#039;security&#039;);
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action=&quot;&quot; id=&quot;user-registration&quot;&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;username&quot;&gt;User name&lt;/label&gt;
+        &lt;div&gt;
+            &lt;input name=&quot;username&quot; id=&quot;username&quot;
+            data-validation=&quot;validate_length length4-20
+                        validate_custom regexp/^[a-zA-Z0-9]+$/&quot;
+            data-help=&quot;4-20 characters, only a-z and numbers&quot; /&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;email2&quot;&gt;E-mail&lt;/label&gt;
+        &lt;div&gt;
+            &lt;input name=&quot;email&quot; type=&quot;email&quot; id=&quot;email2&quot;
+                data-validation=&quot;validate_email validate_backend&quot;
+                data-backend-url=&quot;validate-email.php&quot; /&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;pass2&quot;&gt;Password&lt;/label&gt;
+        &lt;div&gt;
+            &lt;input type=&quot;password&quot; name=&quot;pass&quot; id=&quot;pass2&quot;
+            data-validation=&quot;validate_strength strength1 validate_confirmation&quot; /&gt;
+        &lt;/div&gt;
+        &lt;script&gt;
+            $(function() {
+                $(&#039;#pass2&#039;).displayPasswordStrength();
+            });
+        &lt;/script&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;cpass&quot;&gt;Confirm password&lt;/label&gt;
+        &lt;div&gt;
+            &lt;input type=&quot;password&quot; name=&quot;pass_confirmation&quot; id=&quot;cpass&quot; /&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;birth2&quot;&gt;Birthday&lt;/label&gt;
+        &lt;div&gt;
+            &lt;input id=&quot;birth2&quot;
+                    data-validation=&quot;validate_birthdate&quot; data-help=&quot;dd/mm/yyyy&quot; /&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;sex&quot;&gt;Gender&lt;/label&gt;
+        &lt;div&gt;
+            &lt;select id=&quot;sex&quot; data-validation=&quot;required&quot;&gt;
+                &lt;option value=&quot;&quot;&gt;- - Gender - -&lt;/option&gt;
+                &lt;option&gt;Male&lt;/option&gt;
+                &lt;option&gt;Female&lt;/option&gt;
+            &lt;/select&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;pres&quot;&gt;
+            Presentation&lt;br /&gt;
+            &lt;span style=&quot;font-weight: normal&quot;&gt;
+                &lt;span id=&quot;max-pres-length&quot;&gt;100&lt;/span&gt;
+                characters left
+            &lt;/span&gt;
+        &lt;/label&gt;
+    &lt;div&gt;
+            &lt;textarea id=&quot;pres&quot; rows=&quot;5&quot;&gt;&lt;/textarea&gt;
+        &lt;/div&gt;
+        &lt;script&gt;
+            $(&#039;#pres&#039;).restrictLength($(&#039;#max-pres-length&#039;));
+        &lt;/script&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label for=&quot;agreement&quot;&gt;
+            Please check this box
+            to confirm that you
+            agree with our &lt;a href=&quot;#&quot;&gt;license&lt;/a&gt;
+        &lt;/label&gt;
+        &lt;div&gt;
+            &lt;input type=&quot;checkbox&quot; id=&quot;agreement&quot;
+                    value=&quot;1&quot; name=&quot;license&quot; data-validation=&quot;required&quot; /&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;submit&quot;&gt;
+        &lt;input type=&quot;submit&quot; class=&quot;button&quot; value=&quot;Register&quot; /&gt;
+    &lt;/div&gt;
+&lt;/form&gt;
+&lt;script&gt;
+    $(&#039;#user-registration&#039;)
+        .showHelpOnFocus()
+        .submit(function() {
+            var options = {
+                errorMessagePosition : &#039;element&#039;,
+                dateFormat : &#039;dd/mm/yyyy&#039;
+            };
+            return $(this).validate(false, options);
+        });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                    </pre>
+                </div>
+                <div id="mod-date" class="page">
+                    <h2>Module: date</h2>
+                    <form>
+
+                    </form>
+                </div>
             </div>
 
             <div id="side-column">
                 <ul id="navigation">
                     <li>
-                        <a href="#" onclick="return showPage('home')">
-                            Introduction
-                        </a>
+                        <a href="#" data-page="home" class="current">Introduction</a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="page-core">Core validators</a>
+                    </li>
+                    <li class="sep">
+                        <strong>Modules</strong>
+                    </li>
+                    <li>
+                        <a href="#" data-page="mod-security">Security</a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="mod-date">Date</a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="mod-backend">Backend</a>
+                    </li>
+                    <li class="sep">
+                        <strong>Examples</strong>
+                    </li>
+                    <li>
+                        <a href="#" data-page="page-example">User registration</a>
                     </li>
                 </ul>
             </div>

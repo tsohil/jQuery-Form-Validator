@@ -1,13 +1,15 @@
 $blue: #0996b9;
+$black : #555;
+$blue-dark: #1f6e82;
 $padding: 12px;
+
 
 /* FONT MIXINS */
 
 @mixin font-base {
     font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
     font-size: 10pt;
-    line-height: 150%;
-    color: #555;
+    color: $black;
 }
 
 @mixin font-large {
@@ -24,6 +26,7 @@ $padding: 12px;
 }
 
 @mixin graded($from, $to) {
+    background: $to;
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from($from), to($to));
     background-image: -moz-linear-gradient(top, $from, $to);
 }
@@ -36,14 +39,15 @@ $padding: 12px;
 }
 
 * {
-    @include font-base;
     margin:0;
     padding: 0;
 }
 
 body {
+    @include font-base;
     background:#F2F2F2;
     cursor: default;
+    margin-bottom: 35px;
 }
 
 h1, h2, h3, h4 {
@@ -53,23 +57,41 @@ h1, h2, h3, h4 {
 p, h2, h3, h4 {
     @include font-base;
     cursor: text;
+    line-height: 150%;
 }
 
 h2 {
+    line-height: normal;
     font-size: 16pt;
     border-bottom: #CCC solid 1px;
-    padding-bottom: 5px;
-    margin-bottom: 20px;
+    padding-bottom: 8px;
+    margin-bottom: 25px;
 }
 
 a:link, a:visited {
+    color: $black;
     cursor: pointer;
 }
 a:hover, a:active {
+    color: $blue;
     text-decoration: none;
     color:#111;
 }
 
 h3 {
     font-size: 13pt;
+}
+
+.code-wrapper {
+    padding-top:12px;
+
+    h4 {
+        margin:12px 0 0;
+        padding: 6px;
+        background: #E2E2E2;
+    }
+
+    pre {
+        margin-top: 0;
+    }
 }

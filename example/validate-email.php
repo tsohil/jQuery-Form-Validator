@@ -1,4 +1,5 @@
 <?php
+sleep(1);
 $json = array();
 
 if(count($_POST) == 0)

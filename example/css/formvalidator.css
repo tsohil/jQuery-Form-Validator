@@ -1,5 +1,38 @@
 
 /*
+  Container that displays validation errors
+*/
+.jquery_form_error_message {
+    background:pink;
+    padding: 5px 8px;
+    color: #8b0000;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.jquery_form_error_message strong {
+    color: #8b0000;
+}
+
+
+/*
+ Class that will be applied on element showing
+ help information defined in attribute data-help ($(form).showHelpOnFocus)
+*/
+.jquery_form_help {
+    position: absolute;
+    background: #f5f5f5;
+    font-style: italic;
+    padding: 4px 6px;
+    margin-left: 10px;
+    margin-top: 3px;
+    border-radius: 4px;
+    color: #888;
+    font-size: 8pt;
+}
+
+
+/*
  Module: security
  This class will be applied on the element displaying password strength
 */
@@ -7,4 +40,22 @@
     margin-left: 5px;
     border-radius: 4px;
     border-bottom: 0px !important;
+}
+
+/*
+ Module: backend
+ This class will be applied to the form element during the time
+ that backend is being requested
+*/
+.validating-backend {
+    opacity: 0.5;
+}
+
+/*
+ Module: backend
+ How to target inputs which value is successfully
+ validated by backend
+*/
+input[data-backend-valid=true] {
+    border-color: green !important;
 }
