@@ -25,6 +25,9 @@ $.formUtils.addValidator({
                 });
                 $form.unbind('submit');
             }
+            else {
+                $form.get(0).onsubmit = function() {return false;};
+            }
         }
 
         $form
