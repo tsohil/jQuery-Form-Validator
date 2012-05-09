@@ -99,7 +99,7 @@
                 $.extend(config, settings);
             }
             if (language) {
-                $.extend($.formUtils.LANG,language);
+                $.extend(language, $.formUtils.LANG);
             } else {
                 language = $.formUtils.LANG;
             }
@@ -176,7 +176,7 @@
                 $.extend(config, settings);
             }
             if (language) {
-                $.extend($.formUtils.LANG, language);
+                $.extend(language, $.formUtils.LANG);
             } else {
                 language = $.formUtils.LANG;
             }
