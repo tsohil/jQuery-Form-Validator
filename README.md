@@ -1,7 +1,7 @@
 
 The goal of this project is to create a feature rich jQuery plugin used for validating form data and that
 keeps the HTML code clean from javascript logic. Even though the plugin has **a wide range of validation functions**
-it's designed to consume the least amount bandwidth as possible (which makes it very suitable for **mobile websites**).
+it's designed to consume the least amount of bandwidth as possible (which makes it very suitable for **mobile websites**).
 This is achieved by grouping together functions in "modules", making it possible for the programmer
 to load **only those functions that's needed** to validate a particular form.
 
@@ -16,7 +16,7 @@ to load **only those functions that's needed** to validate a particular form.
   	$.formUtils.loadModules('date,security');
   </script>
 </head>
-<form action="" onsubmit="return $(this).validate()">
+<form action="" onsubmit="return $(this).validate();">
   <p>
     Name (4 characters minimum):
     <input name="user" data-validation="validate_min_length length4" />
@@ -126,12 +126,37 @@ The validation function takes these five arguments:
 
 ## Creating a custom module
 
-A module is simply a script file containing one or more calls to `$.formUtils.addValidator()`. 
+A "module" is basically a script file containing one or more calls to [$.formUtils.addValidator()](#writing-a-custom-validator). The module file
+should either have the extension *.js* (as an ordinary javascript file) or *.dev.js*.
 
+Using the extension **.dev.js** will make the module loading function to always append a timestamp to the end of the
+URL, so that the browser never caches the file. You should of course never use *.dev.js* on a production website.
+
+### Loading your module ###
+
+```
+<html>
+<head>
+    <script src="js/formvalidator/jquery.formvalidator.min.js"></script>
+    <script>
+        $.formUtils.loadModules('mymodule.dev', 'js/validation-modules/');
+    </script>
+</head>
+</html>
+...
+```
+
+The first argument of $.formUtils.loadModules is a comma separated string with names of module files, without
+extension (add .dev if the file name is for example mymodule.dev.js, this will insure that the browser never
+caches the javascript).
+
+The second argument is the path where the module files is located. This argument is optional, if not given
+the module files has to be located in the same directory as the core modules shipped together with this jquery plugin
+(js/formvalidator/)
 
 
 ## Validate inputs on blur
-It is now possible to show that the value of an input is incorrect immediately when the input gets blurred.
+It is possible to show that the value of an input is incorrect immediately when the input gets blurred.
 
 ```html
 <form action="" onsubmit="return $(this).validate();" id="my_form">
