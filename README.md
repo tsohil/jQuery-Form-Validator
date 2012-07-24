@@ -1,9 +1,9 @@
-The goal of this project is to create a feature rich jQuery plugin used for validating form data and that 
+
+The goal of this project is to create a feature rich jQuery plugin used for validating form data and that
 keeps the HTML code clean from javascript logic. Even though the plugin has **a wide range of validation functions**
-it's going to be suitable for **mobile websites**. This is achieved by grouping together functions in "modules", making
-it possible for the programmer to load **only those function that's needed** to validate a particular form.
-
-
+it's designed to consume the least amount bandwidth as possible (which makes it very suitable for **mobile websites**).
+This is achieved by grouping together functions in "modules", making it possible for the programmer
+to load **only those functions that's needed** to validate a particular form.
 
 *Usage example*
 
@@ -37,7 +37,7 @@ it possible for the programmer to load **only those function that's needed** to 
 ```
 
 ## Features
-### Default validators
+### Default validators (no module needed)
  * **validate_url**
  * **validate_email**
  * **validate_domain** — *domain.com*
@@ -62,6 +62,8 @@ it possible for the programmer to load **only those function that's needed** to 
 ### Module: sweden
  * **validate_swemob** — *validate that the value is a swedish mobile telephone number*
  * **validate_swesec** — *validate swedish social security number*
+ * **validate_county** - *validate that the value is an existing county in Sweden*
+ * **validate_municipality** - *validate that the value is an existing municipality in Sweden*
 
 ### Module: ukvat
  * **validate_ukvatnumber**
@@ -69,11 +71,15 @@ it possible for the programmer to load **only those function that's needed** to 
 ### Misc (part of core)
  * Show help information automatically when input is focused
  * Validate given values immediately when input is blurred.
+ * Make validation optional by adding attribute data-validation-optional="true" to the element. This means
+ that the validation defined in data-validation only will take place in case a value is given.
+ * Make validation dependent on another input of type checkbox being checked by adding attribute
+ data-validation-if-checked="name of checkbox input"
 
 
 ## Writing a custom validator
 You can use the function `$.formUtils.addValidator()` to add your own validation function. Here's an example of a validator
-that checks if the input contains an even number
+that checks if the input contains an even number.
 
 ```html
 <html>
@@ -103,11 +109,12 @@ that checks if the input contains an even number
 
 *name* - The name of the validator, which is used in the validation attribute of the input element.
 
-*validate* - callback function that validates the input. 
+*validate* - Callback function that validates the input. Should return a boolean telling if the value is considered valid or not.
 
-*errorMessageKey* - Name of language property that is used in case the value of the input is invalid 
+*errorMessageKey* - Name of language property that is used in case the value of the input is invalid.
 
-*errorMessage* - An alternative error message that is used if errorMessageKey is left with an empty value
+*errorMessage* - An alternative error message that is used if errorMessageKey is left with an empty value or isn't defined
+in the language object. Note that you also can use [inline error messages](#localization) in your form.
 
 
 The validation function takes these five arguments:
@@ -141,7 +148,7 @@ It is now possible to show that the value of an input is incorrect immediately w
 ```
 
 ## Show help information
-Since version 1.1 it is possible to display help information for each input. The information will fade in when input is focused and fade out when input is blurred.
+It is possible to display help information for each input. The information will fade in when input is focused and fade out when input is blurred.
 
 ```html
 <form action="" onsubmit="return $(this).validate();" id="my_form">
@@ -205,10 +212,13 @@ $('#my_form')
 ```
 
 ## Localization
-All error dialogs can be overwritten by passing an object into the validation function.
+This plugin contains a set of error dialogs. In case you don't define an inline error message the plugin
+will fall back on one of the dialogs below. You can how ever add the attribute *data-validation-error-msg* to an
+element, and that message will be displayed instead.  All error dialogs can be overwritten by passing an
+object into the validation function.
 
 ```javascript
-var jQueryFormLang = {
+var enErrorDialogs = {
     errorTitle : 'Form submission failed!',
     requiredFields : 'You have not answered all required fields',
     badTime : 'You have not given a correct time',
@@ -228,7 +238,9 @@ var jQueryFormLang = {
     badCustomVal : 'You gave an incorrect answer',
     badInt : 'Incorrect integer value',
     badSecurityNumber : 'Your social security number was incorrect',
-    badUKVatAnswer : 'Incorrect UK VAT Number'
+    badUKVatAnswer : 'Incorrect UK VAT Number',
+    badNumberOfSelectedOptionsStart : 'You have to choose at least ',
+    badNumberOfSelectedOptionsEnd : ' answers'
 };
 ```
 
@@ -241,7 +253,7 @@ var jQueryFormLang = {
 <head>
 <body>
     ...
-    <form action="script.php" onsubmit="return $(this).validate(jQueryFormLang);">
+    <form action="script.php" onsubmit="return $(this).validate(enErrorDialogs);">
     ...
 ```
 
