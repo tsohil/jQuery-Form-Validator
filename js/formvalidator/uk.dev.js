@@ -1,11 +1,23 @@
-/*
-* Validate that string is a UK VAT Number
-* TODO: Extra Checking for other VAT Numbers (Other countries and UK Government/Health Authorities)
-* Code Adapted from http://www.codingforums.com/showthread.php?t=211967
-*/
+/**
+ * jQuery Form Validator Module: Security
+ * ------------------------------------------
+ * Created by Victor Jonsson <http://www.victorjonsson.se>
+ * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
+ *
+ * This form validation module adds validators typically used on
+ * websites in the UK. This module adds the following validators:
+ *  - validate_ukvatnumber
+ *
+ * @license Dual licensed under the MIT or GPL Version 2 licenses
+ * @version 1.9.1
+ */
 $.formUtils.addValidator({
     name : 'validate_ukvatnumber',
     validate : function(number) {
+
+        // Code Adapted from http://www.codingforums.com/showthread.php?t=211967
+        // TODO: Extra Checking for other VAT Numbers (Other countries and UK Government/Health Authorities)
+
     	number = number.replace(/[^0-9]/g, '');
 
     	//Check Length
