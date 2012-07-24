@@ -126,15 +126,15 @@ The validation function takes these five arguments:
 
 ## Creating a custom module
 
-A "module" is basically a script file containing one or more calls to [$.formUtils.addValidator()](#writing-a-custom-validator). The module file
-should either have the extension *.js* (as an ordinary javascript file) or *.dev.js*.
+A "module" is basically a javascript file containing one or more calls to [$.formUtils.addValidator()](#writing-a-custom-validator). The module file
+should either have the file extension *.js* (as an ordinary javascript file) or *.dev.js*.
 
-Using the extension **.dev.js** will make the module loading function to always append a timestamp to the end of the
+Using the file extension **.dev.js** will tell *$.formUtils.loadModules* to always append a timestamp to the end of the
 URL, so that the browser never caches the file. You should of course never use *.dev.js* on a production website.
 
 ### Loading your module ###
 
-```
+```html
 <html>
 <head>
     <script src="js/formvalidator/jquery.formvalidator.min.js"></script>
@@ -147,7 +147,7 @@ URL, so that the browser never caches the file. You should of course never use *
 ```
 
 The first argument of $.formUtils.loadModules is a comma separated string with names of module files, without
-extension (add .dev if the file name is for example mymodule.dev.js, this will insure that the browser never
+file extension (add .dev if the file name is for example mymodule.dev.js, this will insure that the browser never
 caches the javascript).
 
 The second argument is the path where the module files is located. This argument is optional, if not given
@@ -166,7 +166,6 @@ It is possible to show that the value of an input is incorrect immediately when 
 	</p>
 	...
 </form>
-
 <script>
 	$('#my_form').validateOnBlur();
 </script>
@@ -178,12 +177,11 @@ It is possible to display help information for each input. The information will 
 ```html
 <form action="" onsubmit="return $(this).validate();" id="my_form">
 	<p>
-	  <strong>Why not:</strong>
-	  <textarea name="why" data-help="Please give us some more information" data-validation="required"></textarea>
+	  <strong>Why not?</strong>
+	  <textarea data-help="Please give us some more information" data-validation="required"></textarea>
 	</p>
 	...
 </form>
-
 <script>
 	$('#my_form').showHelpOnFocus();
 </script>
