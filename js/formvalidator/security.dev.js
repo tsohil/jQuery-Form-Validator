@@ -55,8 +55,8 @@
         validate : function(val, $el, conf) {
             var validationRules = $el.attr(conf.validationRuleAttribute);
             var requiredStrength = $.formUtils.getAttributeInteger(validationRules, 'strength');
-            if(requiredStrength > 2)
-                requiredStrength = 2;
+            if(requiredStrength > 3)
+                requiredStrength = 3;
 
             return $.formUtils.validators.validate_strength.calculatePasswordStrength(val) >= requiredStrength;
         },
@@ -155,8 +155,11 @@
             else if (score < 68) {
                 return 1;
             }
-            else {
+            else if(score < 90) {
                 return 2;
+            }
+            else {
+                return 3;
             }
         },
 
@@ -164,6 +167,7 @@
             var config = {
                 fontSize: '12pt',
                 padding: '4px',
+                bad : 'Very bad',
                 weak : 'Weak',
                 good : 'Good',
                 strong : 'Strong'
@@ -198,12 +202,18 @@
                 var text = config.weak;
 
                 if(strength == 1) {
+                    css.background = 'pink';
+                    css.borderColor = 'red';
+                    css.color = 'darkred';
+                    text = config.bad;
+                }
+                else if(strength == 2) {
                     css.background = 'lightyellow';
                     css.borderColor = 'yellow';
                     css.color = 'goldenrod';
                     text = config.good;
                 }
-                else if(strength == 2) {
+                else if(strength == 3) {
                     css.background = 'lightgreen';
                     css.borderColor = 'darkgreen';
                     css.color = 'darkgreen';
