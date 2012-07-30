@@ -1,5 +1,5 @@
 
-**jQuery Form Validator* is a feature rich jQuery plugin that makes it easy to validate user input in HTML forsm
+**jQuery Form Validator** is a feature rich jQuery plugin that makes it easy to validate user input in HTML forsm
 while keeping the HTML code clean from javascript logic. Even though the plugin has **a wide range of validation functions**
 it's designed to consume as little bandwidth as possible (which makes it very suitable for **mobile websites**).
 This is achieved by grouping together validation functions in "modules", making it possible for the programmer
@@ -331,6 +331,15 @@ $_SESSION['captcha'] = array( mt_rand(0,9), mt_rand(1, 9) );
   <p>Password: <input type="password" name="pass" data-validation="validate_confirmation" /></p>
   <p>Confirm password: <input type="password" name="pass_confirmation" /></p>
 ```
+
+## Changelog
+
+### 2.0
+ * validate_[min|max]_length is removed (now merged with validate_length)
+ * validate_number, validate_int, validate_float is merged together, all three variants is now validated by validate_number
+ * validate_phone moved to "sweden" module and renamed to validate_swephone
+ * The attribute to be used when defining the regular expression for validate_custom is now moved to its own attribute
+ * validate_length now looks at attribute data-validation-length to find out how long or short the value must be
 
 ## Contributors
 [Joel Sutherland](https://github.com/robamaton) (contributor)<br />

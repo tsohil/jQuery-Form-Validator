@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.4
+* @version 1.9.7
 */
 (function($) {
 
@@ -413,7 +413,6 @@
             var loadModuleScripts = function(modules, path) {
                 $.each(modules.split(','), function(i, module) {
                     var scriptUrl = path + $.trim(module) + '.js';
-                    var doCache = scriptUrl.substr(-7) != '.dev.js';
                     $.ajax({
                         url : scriptUrl,
                         cache : scriptUrl.substr(-7) != '.dev.js',
@@ -1005,54 +1004,38 @@
     });
 
     /*
-    * Validate min length
-    */
-    $.formUtils.addValidator({
-        name : 'validate_min_length',
-        validate : function(value, $el, config, language) {
-            var validationRules = $el.attr(config.validationRuleAttribute);
-            var minLength = $.formUtils.getAttributeInteger(validationRules, 'length');
-            if (value.length < minLength) {
-                this.errorMessage = language.toShortStart + minLength + language.toShortEnd;
-                return false;
-            }
-            return true;
-        },
-        errorMessage : '',
-        errorMessageKey: ''
-    });
-
-    /*
-    * Validate max length
-    */
-    $.formUtils.addValidator({
-        name : 'validate_max_length',
-        validate : function(value, $el, config, language) {
-            var validationRules = $el.attr(config.validationRuleAttribute);
-            var maxLength = $.formUtils.getAttributeInteger(validationRules, 'length');
-            if (value.length > maxLength) {
-                this.errorMessage = language.toLongStart + maxLength + language.toLongEnd;
-                return false;
-            }
-            return true;
-        },
-        errorMessage : '',
-        errorMessageKey: ''
-    });
-
-    /*
     * Validate length range
     */
     $.formUtils.addValidator({
         name : 'validate_length',
         validate : function(value, $el, config, language) {
-            var validationRules = $el.attr(config.validationRuleAttribute);
-            var lengthRange = $.formUtils.getAttributeInteger(validationRules, 'length');
-            var range = lengthRange.split('-');
-            if (value.length < parseInt(range[0],10) || value.length > parseInt(range[1],10)) {
-                this.errorMessage = language.badLength + lengthRange + language.toLongEnd;
+            var len = $el.attr('data-validation-length');
+            var range = len.split('-');
+
+            // range
+            if(range.length == 2 && (value.length < parseInt(range[0],10) || value.length > parseInt(range[1],10))) {
+                this.errorMessage = language.badLength + len + language.toLongEnd;
                 return false;
             }
+            else if(len.indexOf('min') === 0) {
+                var minLength = parseInt(len.substr(3),10);
+                if(minLength > value.length) {
+                    this.errorMessage = language.toShortStart + minLength + language.toShortEnd;
+                    return false;
+                }
+            }
+            else if(len.indexOf('max') === 0) {
+                var maxLength = parseInt(len.substr(3),10);
+                if(maxLength < value.length) {
+                    this.errorMessage = language.toLongStart + maxLength + language.toLongEnd;
+                    return false;
+                }
+            }
+            else {
+                var elementType = $el.get(0).nodeName;
+                alert('Please add attribute "data-validation-length" to '+elementType+' named '+$el.attr('name'));
+            }
+
             return true;
         },
         errorMessage : '',
@@ -1065,7 +1048,7 @@
     $.formUtils.addValidator({
         name : 'validate_url',
         validate : function(url) {
-            // contributed by Scott Gonzalez: http://projects.scottsplayground.com/iri/ but added support for arrays in the url ?arg[]=sdfsdf
+            // written by Scott Gonzalez: http://projects.scottsplayground.com/iri/ but added support for arrays in the url ?arg[]=sdfsdf
             var urlFilter = /^(https|http|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|\[|\]|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
             if(urlFilter.test(url)) {
                 var domain = url.split(/^https|^http|^ftp/i)[1].replace('://', '');
@@ -1086,8 +1069,23 @@
     */
     $.formUtils.addValidator({
         name : 'validate_number',
-        validate : function(val) {
-            return $.formUtils.validators.validate_int.validate(val) || $.formUtils.validators.validate_float.validate(val);
+        validate : function(val, $el) {
+            if(val !== '') {
+                var allowing = $el.attr('data-validation-allowing');
+                if(allowing === undefined)
+                    allowing = 'number';
+
+                if(allowing.indexOf('negative') > -1 && val.indexOf('-') === 0)
+                    val = val.substr(1);
+
+                if(allowing.indexOf('number') > -1 && val.replace(/[0-9]/g, '') === '') {
+                    return true;
+                }
+                if(allowing.indexOf('float') > -1 && val.match(/^([0-9]+)\.([0-9]+)$/) !== null) {
+                    return true;
+                }
+            }
+            return false;
         },
         errorMessage : '',
         errorMessageKey: 'badInt'
@@ -1099,36 +1097,11 @@
     $.formUtils.addValidator({
         name : 'validate_custom',
         validate : function(val, $el, config) {
-            var attr = $el.attr(config.validationRuleAttribute);
-            var regexp = new RegExp(attr.split('regexp/')[1].split('/')[0]);
+            var regexp = new RegExp($el.attr('data-validation-regexp'));
             return regexp.test(val);
         },
         errorMessage : '',
         errorMessageKey: 'badCustomVal'
-    });
-
-    /*
-    * Validate integer
-    */
-    $.formUtils.addValidator({
-        name : 'validate_int',
-        validate : function(val) {
-            return val !== '' && val.replace(/[0-9]/g, '') === '';
-        },
-        errorMessage : '',
-        errorMessageKey: 'badInt'
-    });
-
-    /*
-    * Validate floating number
-    */
-    $.formUtils.addValidator({
-        name : 'validate_float',
-        validate : function(val) {
-            return val.match(/^(\-|)([0-9]+)\.([0-9]+)$/) !== null;
-        },
-        errorMessage : '',
-        errorMessageKey: 'badFloat'
     });
 
     /*
@@ -1149,29 +1122,6 @@
         },
         errorMessage : '',
         errorMessageKey: 'badDate'
-    });
-
-    /*
-    * Validate phone number, at least 7 digits only one hyphen and plus allowed
-    */
-    $.formUtils.addValidator({
-        name : 'validate_phone',
-        validate : function(tele) {
-            var numPlus = tele.match(/\+/g);
-            var numHifen = tele.match(/-/g);
-
-            if ((numPlus !== null && numPlus.length > 1) || (numHifen !== null && numHifen.length > 1)) {
-                return false;
-            }
-            if (numPlus !== null && tele.indexOf('+') !== 0) {
-                return false;
-            }
-
-            tele = tele.replace(/([-|\+])/g, '');
-            return tele.length > 8 && tele.match(/[^0-9]/g) === null;
-        },
-        errorMessage : '',
-        errorMessageKey: 'badTelephone'
     });
 
 })(jQuery);

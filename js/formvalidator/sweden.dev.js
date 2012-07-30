@@ -10,9 +10,10 @@
  *  - validate_swemobile
  *  - validate_validate_municipality
  *  - validate_county
+ *  - validate_swephone
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.4
+ * @version 1.9.7
  */
 (function($) {
 
@@ -145,6 +146,30 @@
         errorMessage : '',
         errorMessageKey: 'badCustomVal',
         municipalities : ['ale','alingsås','alvesta','aneby','arboga','arjeplog','arvidsjaur','arvika','askersund','avesta','bengtsfors','berg','bjurholm','bjuv','boden','bollebygd','bollnäs','borgholm','borlänge','borås','botkyrka','boxholm','bromölla','bräcke','burlöv','båstad','dals-ed','danderyd','degerfors','dorotea','eda','ekerö','eksjö','emmaboda','enköpings','eskilstuna','eslövs','essunga','fagersta','falkenberg','falköping','falu','filipstad','finspång','flen','forshaga','färgelanda','gagnef','gislaved','gnesta','gnosjö','gotland','grum','grästorp','gullspång','gällivare','gävle','göteborg','götene','habo','hagfor','hallsberg','hallstahammar','halmstad','hammarö','haninge','haparanda','heby','hedemora','helsingborg','herrljunga','hjo','hofor','huddinge','hudiksvall','hultsfred','hylte','håbo','hällefor','härjedalen','härnösand','härryda','hässleholm','höganäs','högsby','hörby','höör','jokkmokk','järfälla','jönköping','kalix','kalmar','karlsborg','karlshamn','karlskoga','karlskrona','karlstad','katrineholm','kil','kinda','kiruna','klippan','knivsta','kramfors','kristianstad','kristinehamn','krokoms','kumla','kungsbacka','kungsör','kungälv','kävlinge','köping','laholm','landskrona','laxå','lekeberg','leksand','lerum','lessebo','lidingö','lidköping','lilla edets','lindesbergs','linköpings','ljungby','ljusdals','ljusnarsbergs','lomma','ludvika','luleå','lunds','lycksele','lysekil','malmö','malung-sälen','malå','mariestad','marks','markaryd','mellerud','mjölby','mora','motala','mullsjö','munkedal','munkfors','mölndal','mönsterås','mörbylånga','nacka','nora','norberg','nordanstig','nordmaling','norrköping','norrtälje','norsjö','nybro','nykvarn','nyköping','nynäshamn','nässjö','ockelbo','olofström','orsa','orust','osby','oskarshamn','ovanåker','oxelösund','pajala','partille','perstorp','piteå','ragunda','robertsfors','ronneby','rättvik','sala','salem','sandviken','sigtuna','simrishamn','sjöbo','skara','skellefteå','skinnskatteberg','skurup','skövde','smedjebacken','sollefteå','sollentuna','solna','sorsele','sotenäs','staffanstorp','stenungsund','stockholm','storfors','storuman','strängnäs','strömstad','strömsund','sundbyberg','sundsvall','sunne','surahammar','svalöv','svedala','svenljunga','säffle','säter','sävsjö','söderhamns','söderköping','södertälje','sölvesborg','tanum','tibro','tidaholm','tierp','timrå','tingsryd','tjörn','tomelilla','torsby','torså','tranemo','tranå','trelleborg','trollhättan','trosa','tyresö','täby','töreboda','uddevalla','ulricehamns','umeå','upplands väsby','upplands-bro','uppsala','uppvidinge','vadstena','vaggeryd','valdemarsvik','vallentuna','vansbro','vara','varberg','vaxholm','vellinge','vetlanda','vilhelmina','vimmerby','vindeln','vingåker','vårgårda','vänersborg','vännäs','värmdö','värnamo','västervik','västerås','växjö','ydre','ystad','åmål','ånge','åre','årjäng','åsele','åstorp','åtvidaberg','älmhult','älvdalen','älvkarleby','älvsbyn','ängelholm','öckerö','ödeshög','örebro','örkelljunga','örnsköldsvik','östersund','österåker','östhammar','östra göinge','överkalix','övertorneå']
+    });
+
+
+    /*
+     * Validate phone number, at least 7 digits only one hyphen and plus allowed
+     */
+    $.formUtils.addValidator({
+        name : 'validate_swephone',
+        validate : function(tele) {
+            var numPlus = tele.match(/\+/g);
+            var numHifen = tele.match(/-/g);
+
+            if ((numPlus !== null && numPlus.length > 1) || (numHifen !== null && numHifen.length > 1)) {
+                return false;
+            }
+            if (numPlus !== null && tele.indexOf('+') !== 0) {
+                return false;
+            }
+
+            tele = tele.replace(/([-|\+])/g, '');
+            return tele.length > 8 && tele.match(/[^0-9]/g) === null;
+        },
+        errorMessage : '',
+        errorMessageKey: 'badTelephone'
     });
 
     /**
