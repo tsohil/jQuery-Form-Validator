@@ -5,14 +5,14 @@
  * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
  *
  * This form validation module adds validators typically used when validating
- * user registration forms. This module add the following validators:
+ * user registration forms. This module adds the following validators:
  *  - validate_spamcheck
  *  - validate_confirmation
  *  - validate_strength
  *  - validate_backend
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.1
+ * @version 1.9.4
  */
 (function($) {
 

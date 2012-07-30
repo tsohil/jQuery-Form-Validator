@@ -5,14 +5,14 @@
  * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
  *
  * This form validation module adds validators used to validate date
- * and time values. The following validators will be added
+ * and time values. The following validators will be added by
  * this module:
  *  - validate_time
  *  - validate_birthdate
  *
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.1
+ * @version 1.9.4
  */
 (function($) {
 

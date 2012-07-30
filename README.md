@@ -1,8 +1,8 @@
 
-The goal of this project is to create a feature rich jQuery plugin used for validating form data and that
-keeps the HTML code clean from javascript logic. Even though the plugin has **a wide range of validation functions**
-it's designed to consume the least amount of bandwidth as possible (which makes it very suitable for **mobile websites**).
-This is achieved by grouping together functions in "modules", making it possible for the programmer
+**jQuery Form Validator* is a feature rich jQuery plugin that makes it easy to validate user input in HTML forsm
+while keeping the HTML code clean from javascript logic. Even though the plugin has **a wide range of validation functions**
+it's designed to consume as little bandwidth as possible (which makes it very suitable for **mobile websites**).
+This is achieved by grouping together validation functions in "modules", making it possible for the programmer
 to load **only those functions that's needed** to validate a particular form.
 
 *Usage example*
@@ -36,7 +36,6 @@ to load **only those functions that's needed** to validate a particular form.
 ...
 ```
 
-## Features
 ### Default validators (no module needed)
  * **validate_url**
  * **validate_email**
@@ -59,11 +58,20 @@ to load **only those functions that's needed** to validate a particular form.
  * **validate_time** — *hh:mm*
  * **validate_birthdate** — *yyyy-mm-dd, not allowing dates in the future or dates that's older than 122 years (format can be customized, more information below)*
 
+### Module: location
+ * **validate_country**
+ * **validate_federatestate**
+ * **validate_longlat**
+ * Suggest countries (english only)
+ * Suggest states in the US
+
 ### Module: sweden
  * **validate_swemob** — *validate that the value is a swedish mobile telephone number*
  * **validate_swesec** — *validate swedish social security number*
  * **validate_county** - *validate that the value is an existing county in Sweden*
  * **validate_municipality** - *validate that the value is an existing municipality in Sweden*
+ * Suggest county
+ * Suggest municipality
 
 ### Module: ukvat
  * **validate_ukvatnumber**
@@ -75,6 +83,7 @@ to load **only those functions that's needed** to validate a particular form.
  that the validation defined in data-validation only will take place in case a value is given.
  * Make validation dependent on another input of type checkbox being checked by adding attribute
  data-validation-if-checked="name of checkbox input"
+ * Create input suggestions with ease, no jquery-ui needed
 
 
 ## Writing a custom validator

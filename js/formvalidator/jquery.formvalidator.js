@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.1
+* @version 1.9.4
 */
 (function($) {
 
@@ -17,13 +17,11 @@
     * @return {jQuery}
     */
     $.fn.validateOnBlur = function(language, settings) {
-        $(this)
-            .find('textarea,input')
-                .blur(function() {
-                   $(this).doValidate(language, settings);
-                });
+        this.find('textarea,input').blur(function() {
+               $(this).doValidate(language, settings);
+            });
 
-        return $(this);
+        return this;
     };
 
     /**
@@ -38,20 +36,20 @@
             attrName = 'data-help';
         }
 
-        $(this).find('textarea,input').each(function() {
-            var help = $(this).attr(attrName);
+        this.find('textarea,input').each(function() {
+            var $element = $(this);
+            var help = $element.attr(attrName);
             if(help) {
-                $(this)
+                $element
                     .focus(function() {
                         var $element = $(this);
                         if($element.parent().find('.jquery_form_help').length == 0) {
-                            $element.after(
-                                  $('<span />')
-                                    .addClass('jquery_form_help')
-                                    .text(help)
-                                    .hide()
-                                    .fadeIn()
-                                );
+                            var $span = $('<span />')
+                                            .addClass('jquery_form_help')
+                                            .text(help)
+                                            .hide()
+                                            .fadeIn();
+                            $element.after($span);
                         }
                     })
                     .blur(function() {
@@ -65,7 +63,7 @@
             }
         });
 
-        return $(this);
+        return this;
     };
 
     /**
@@ -83,7 +81,7 @@
             attachKeyupEvent = true;
         }
 
-        var $element = $(this);
+        var $element = this;
         // test if there is custom obj to hold element error msg (id = element name + err_msg)
         var elementErrMsgObj = document.getElementById($element.attr('name')+'_err_msg');
 
@@ -132,9 +130,7 @@
         var validation = $.formUtils.validateInput($element, language, config, $form);
 
         if(validation === true) {
-            $element
-                .unbind('keyup')
-                .addClass('valid');
+            $element.addClass('valid');
         } else {
             $element
                 .addClass(config.errorElementClass)
@@ -158,7 +154,7 @@
             }
         }
 
-        return $(this);
+        return this;
     };
 
     /**
@@ -214,7 +210,7 @@
         var errorInputs = [];
 
         /** Form instance */
-        var $form = $(this);
+        var $form = this;
 
         /**
          * Tells whether or not to validate element with this name and of this type
@@ -417,6 +413,7 @@
             var loadModuleScripts = function(modules, path) {
                 $.each(modules.split(','), function(i, module) {
                     var scriptUrl = path + $.trim(module) + '.js';
+                    var doCache = scriptUrl.substr(-7) != '.dev.js';
                     $.ajax({
                         url : scriptUrl,
                         cache : scriptUrl.substr(-7) != '.dev.js',
@@ -525,7 +522,7 @@
                             }
                             return validationErrorMsg;
                         }
-                    } else if (typeof console != 'undefined' && 'warn' in console) {
+                    } else if (posRules[i].substr(9) == 'validate_' && typeof console != 'undefined' && 'warn' in console) {
                         console.warn('Using undefined validator "'+posRules[i]+'"');
                     }
                 }
@@ -665,6 +662,191 @@
            }
         },
 
+        _numSuggestionElements : 0,
+        _selectedSuggestion : null,
+        _previousTypedVal : null,
+
+        /**
+         * Utility function that can be used to create plugins that gives
+         * suggestions when inputs is typed into
+         * @param {jQuery} $element
+         * @param {Array} suggestions
+         * @param {Object} settings - Optional
+         * @return {jQuery}
+         */
+        suggest : function($element, suggestions, settings) {
+            var config =  {
+                css : {
+                    maxHeight: '150px',
+                    background: '#FFF',
+                    lineHeight:'150%',
+                    textDecoration : 'underline',
+                    overflowX : 'hidden',
+                    overflowY : 'auto',
+                    cursor: 'pointer    '
+                },
+                activeSuggestionCSS : {
+                    background : '#F2F2F2'
+                }
+            };
+
+            if(settings)
+                $.extend(config, settings);
+
+            config.css['position'] = 'absolute';
+            config.css['z-index'] = 9999;
+            $element.attr('autocomplete', 'off');
+
+            this._numSuggestionElements++;
+
+            $element
+                .attr('data-validation-suggestion-nr', this._numSuggestionElements)
+                .bind('focus', function() {
+                    $(this).trigger('keyup');
+                    $.formUtils._selectedSuggestion = null;
+                })
+                .bind('keyup', function() {
+                    var $input = $(this);
+                    var foundSuggestions = [];
+                    var val = $.trim($input.val()).toLocaleLowerCase();
+                    if(val == $.formUtils._previousTypedVal) {
+                        return;
+                    }
+                    else {
+                        $.formUtils._previousTypedVal = val;
+                    }
+
+                    var hasTypedSuggestion = false;
+                    var suggestionId = $input.attr('data-validation-suggestion-nr');
+                    var $suggestionContainer = $('.jquery-form-suggestion-'+suggestionId);
+                    $suggestionContainer.scrollTop(0);
+
+                    // Find the right suggestions
+                    if(val != '') {
+                        $.each(suggestions, function(i, v) {
+                            if(v.toLocaleLowerCase().indexOf(val) === 0) {
+                                foundSuggestions.push(v);
+                            }
+                        });
+
+                        if(foundSuggestions.length == 1 && foundSuggestions[0].length == val.length)
+                            hasTypedSuggestion = true;
+                    }
+
+                    // Hide suggestion container
+                    if(hasTypedSuggestion || (foundSuggestions.length == 0 && $suggestionContainer.length > 0)) {
+                        $suggestionContainer.hide();
+                    }
+
+                    // Create suggestion container if not already exists
+                    else if(foundSuggestions.length > 0 && $suggestionContainer.length == 0) {
+                        $suggestionContainer = $('<div></div>').css(config.css).appendTo('body');
+                        $suggestionContainer.addClass('jquery-form-suggestions');
+                        $suggestionContainer.addClass('jquery-form-suggestion-'+suggestionId);
+                    }
+
+                    // Show hidden container
+                    else if(foundSuggestions.length > 0 && !$suggestionContainer.is(':visible')) {
+                        $suggestionContainer.show();
+                    }
+
+                    // add suggestions
+                    if(foundSuggestions.length > 0 && val.length != foundSuggestions[0].length) {
+
+                        // put container in place every time, just in case
+                        var offset = $input.offset();
+                        $suggestionContainer.css({
+                            width : $input.outerWidth(),
+                            left : offset.left + 'px',
+                            top : (offset.top + $input.outerHeight()) +'px'
+                        });
+
+                        // Add suggestions HTML to container
+                        $suggestionContainer.html('');
+                        $.each(foundSuggestions, function(i, s) {
+                            $('<div></div>')
+                                .text(s)
+                                .appendTo($suggestionContainer)
+                                .click(function() {
+                                    $input
+                                        .val( $(this).text() )
+                                        .trigger('blur');
+                                });
+                        });
+                    }
+                })
+                .bind('keydown', function(e) {
+                    var code = (e.keyCode ? e.keyCode : e.which),
+                        suggestionId,
+                        $suggestionContainer,
+                        $input = $(this);
+
+                    if(code == 13 && $.formUtils._selectedSuggestion !== null) {
+                        suggestionId = $input.attr('data-validation-suggestion-nr');
+                        $suggestionContainer = $('.jquery-form-suggestion-'+suggestionId);
+                        if($suggestionContainer.length > 0) {
+                            $input
+                                .val( $suggestionContainer.find('div').eq($.formUtils._selectedSuggestion).text() )
+                                .trigger('blur');
+
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                    else {
+                        suggestionId = $input.attr('data-validation-suggestion-nr');
+                        $suggestionContainer = $('.jquery-form-suggestion-'+suggestionId);
+                        var $suggestions = $suggestionContainer.children();
+                        if($suggestions.length > 0 && $.inArray(code, [38,40]) > -1) {
+                            if(code == 38) { // key up
+                                if($.formUtils._selectedSuggestion === null)
+                                    $.formUtils._selectedSuggestion = $suggestions.length-1;
+                                else
+                                    $.formUtils._selectedSuggestion--;
+                                if($.formUtils._selectedSuggestion < 0)
+                                    $.formUtils._selectedSuggestion = $suggestions.length-1;
+                            }
+                            else if(code == 40) { // key down
+                                if($.formUtils._selectedSuggestion === null)
+                                    $.formUtils._selectedSuggestion = 0;
+                                else
+                                    $.formUtils._selectedSuggestion++;
+                                if($.formUtils._selectedSuggestion > ($suggestions.length-1))
+                                    $.formUtils._selectedSuggestion = 0;
+
+                            }
+
+                            // Scroll in suggestion window
+                            var containerInnerHeight = $suggestionContainer.innerHeight();
+                            var containerScrollTop = $suggestionContainer.scrollTop();
+                            var suggestionHeight = $suggestionContainer.children().eq(0).outerHeight();
+                            var activeSuggestionPosY = suggestionHeight * ($.formUtils._selectedSuggestion);
+                            if( activeSuggestionPosY < containerScrollTop || activeSuggestionPosY > (containerScrollTop+containerInnerHeight)) {
+                                $suggestionContainer.scrollTop( activeSuggestionPosY );
+                            }
+
+                            $suggestions
+                                .removeClass('active-suggestion')
+                                .css('background', 'none')
+                                .eq($.formUtils._selectedSuggestion)
+                                    .addClass('active-suggestion')
+                                    .css(config.activeSuggestionCSS);
+
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                })
+                .bind('blur', function() {
+                    var suggestionId = $(this).attr('data-validation-suggestion-nr');
+                    $.formUtils._selectedSuggestion = null;
+                    $.formUtils._previousTypedVal = null;
+                    $('.jquery-form-suggestion-'+suggestionId).fadeOut('fast');
+                });
+
+            return $element;
+        },
+
        /**
         * Error dialogs
         *
@@ -699,7 +881,7 @@
 
 
     /* * * * * * * * * * * * * * * * * * * * * *
-      ADD CORE VALIDATORS
+      CORE VALIDATORS
     * * * * * * * * * * * * * * * * * * * * */
 
 

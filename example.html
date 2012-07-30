@@ -9,6 +9,9 @@
 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <script type="text/javascript" src="js/formvalidator/jquery.formvalidator.js"></script>
+    <script>
+        $.formUtils.loadModules('date.dev, sweden.dev, security.dev, uk.dev');
+    </script>
 
     <link href="style.css?upd=1.5" type="text/css" rel="stylesheet"/>
 
@@ -229,6 +232,11 @@
         </p>
 
         <p>
+            <strong>Country suggestion/strong>
+            <input type="text" id="country" name="country" />
+        </p>
+
+        <p>
             <strong>Time HH:mm</strong> <em>validate_time</em><br/>
             <input type="text" data-validation-if-checked="disable_hours" data-validation="validate_time" name="hours"/>
         </p>
@@ -256,6 +264,10 @@
                 })
                 .validateOnBlur(false, validationSettings)
                 .showHelpOnFocus();
+
+        $(function() {
+            $('#country').suggestSwedishMunicipality();
+        });
 
     </script>
 

@@ -12,7 +12,7 @@
  *  - validate_county
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.1
+ * @version 1.9.4
  */
 (function($) {
 
@@ -82,23 +82,93 @@
     });
 
     $.formUtils.addValidator({
-        name : 'validate_county',
+        name : 'validate_swecounty',
         validate : function(str) {
-            return $.inArray(str, this.counties) > -1;
+            str = str.toLowerCase();
+            if($.inArray(str, this.counties) == -1) {
+                if(str.substr(-3).toLocaleLowerCase() != 'län') {
+                    return $.inArray(str + 's län', this.counties) > -1;
+                }
+
+                return false;
+            }
+            else
+                return true;
         },
         errorMessage: '',
         errorMessageKey: 'badCustomVal',
-        counties : ['Västra Götalands län','Västra Götalands län','Kronobergs län','Jönköpings län','Västmanlands län','Norrbottens län','Norrbottens län','Värmlands län','Örebro län','Dalarnas län','Västra Götalands län','Jämtlands län','Västerbottens län','Skåne län','Norrbottens län','Västra Götalands län','Gävleborgs län','Kalmar län','Bor län','Dalarnas län','Västra Götalands län','Stockholms län','Östergötlands län','Skåne län','Jämtlands län','Skåne län','Skåne län','Västra Götalands län','Stockholms län','Örebro län','Västerbottens län','Värmlands län','Stockholms län','Jönköpings län','Kalmar län','Uppsala län','Södermanlands län','Skåne län','Västra Götalands län','Västmanlands län','Hallands län','Västra Götalands län','Dalarnas län','Värmlands län','Östergötlands län','Södermanlands län','Värmlands län','Västra Götalands län','Dalarnas län','Jönköpings län','Södermanlands län','Jönköpings län','Gotlands län','Värmlands län','Västra Götalands län','Västra Götalands län','Norrbottens län','Gävleborgs län','Västra Götalands län','Västra Götalands län','Jönköpings län','Värmlands län','Örebro län','Västmanlands län','Hallands län','Värmlands län','Stockholms län','Norrbottens län','Uppsala län','Dalarnas län','Skåne län','Västra Götalands län','Västra Götalands län','Gävleborgs län','Stockholms län','Gävleborgs län','Kalmar län','Hallands län','Uppsala län','Örebro län','Jämtlands län','Västernorrlands län','Västra Götalands län','Skåne län','Skåne län','Kalmar län','Skåne län','Skåne län','Norrbottens län','Stockholms län','Jönköpings län','Norrbottens län','Kalmar län','Västra Götalands län','Blekinge län','Örebro län','Blekinge län','Värmlands län','Södermanlands län','Värmlands län','Östergötlands län','Norrbottens län','Skåne län','Uppsala län','Västernorrlands län','Skåne län','Värmlands län','Jämtlands län','Örebro län','Hallands län','Västmanlands län','Västra Götalands län','Skåne län','Västmanlands län','Hallands län','Skåne län','Örebro län','Örebro län','Dalarnas län','Västra Götalands län','Kronobergs län','Stockholms län','Västra Götalands län','Västra Götalands län','Örebro län','Östergötlands län','Kronobergs län','Gävleborgs län','Örebro län','Skåne län','Dalarnas län','Norrbottens län','Skåne län','Västerbottens län','Västra Götalands län','Skåne län','Dalarnas län','Västerbottens län','Västra Götalands län','Västra Götalands län','Kronobergs län','Västra Götalands län','Östergötlands län','Dalarnas län','Östergötlands län','Jönköpings län','Västra Götalands län','Värmlands län','Västra Götalands län','Kalmar län','Kalmar län','Stockholms län','Örebro län','Västmanlands län','Gävleborgs län','Västerbottens län','Östergötlands län','Stockholms län','Västerbottens län','Kalmar län','Stockholms län','Södermanlands län','Stockholms län','Jönköpings län','Gävleborgs län','Blekinge län','Dalarnas län','Västra Götalands län','Skåne län','Kalmar län','Gävleborgs län','Södermanlands län','Norrbottens län','Västra Götalands län','Skåne län','Norrbottens län','Jämtlands län','Västerbottens län','Blekinge län','Dalarnas län','Västmanlands län','Stockholms län','Gävleborgs län','Stockholms län','Skåne län','Skåne län','Västra Götalands län','Västerbottens län','Västmanlands län','Skåne län','Västra Götalands län','Dalarnas län','Västernorrlands län','Stockholms län','Stockholms län','Västerbottens län','Västra Götalands län','Skåne län','Västra Götalands län','Stockholms län','Värmlands län','Västerbottens län','Södermanlands län','Västra Götalands län','Jämtlands län','Stockholms län','Västernorrlands län','Värmlands län','Västmanlands län','Skåne län','Skåne län','Västra Götalands län','Värmlands län','Dalarnas län','Jönköpings län','Gävleborgs län','Östergötlands län','Stockholms län','Blekinge län','Västra Götalands län','Västra Götalands län','Västra Götalands län','Uppsala län','Västernorrlands län','Kronobergs län','Västra Götalands län','Skåne län','Värmlands län','Kalmar län','Västra Götalands län','Jönköpings län','Skåne län','Västra Götalands län','Södermanlands län','Stockholms län','Stockholms län','Västra Götalands län','Västra Götalands län','Västra Götalands län','Västerbottens län','Stockholms län','Stockholms län','Uppsala län','Kronobergs län','Östergötlands län','Jönköpings län','Östergötlands län','Stockholms län','Dalarnas län','Västra Götalands län','Hallands län','Stockholms län','Skåne län','Jönköpings län','Västerbottens län','Kalmar län','Västerbottens län','Södermanlands län','Västra Götalands län','Västra Götalands län','Västerbottens län','Stockholms län','Jönköpings län','Kalmar län','Västmanlands län','Kronobergs län','Östergötlands län','Skåne län','Västra Götalands län','Västernorrlands län','Jämtlands län','Värmlands län','Västerbottens län','Skåne län','Östergötlands län','Kronobergs län','Dalarnas län','Uppsala län','Norrbottens län','Skåne län','Västra Götalands län','Östergötlands län','Örebro län','Skåne län','Västernorrlands län','Jämtlands län','Stockholms län','Uppsala län','Skåne län','Norrbottens län']
+        counties : ['stockholms län',
+            'uppsala län',
+            'södermanlands län',
+            'östergötlands län',
+            'jönköpings län',
+            'kronobergs län',
+            'kalmar län',
+            'gotlands län',
+            'blekinge län',
+            'skåne län',
+            'hallands län',
+            'västra götalands län',
+            'värmlands län',
+            'örebro län',
+            'västmanlands län',
+            'dalarnas län',
+            'gävleborgs län',
+            'västernorrlands län',
+            'jämtlands län',
+            'västerbottens län',
+            'norrbottens län']
     });
 
     $.formUtils.addValidator({
-        name : 'validate_municipality',
+        name : 'validate_swemunicipality',
         validate : function(str) {
-            return $.inArray(str, this.municipalities) > -1;
+            str = str.toLowerCase();
+            if($.inArray(str, this.municipalities) == -1) {
+
+                // First check (dont return)
+                if(str.substr(-8) == 's kommun') {
+                    if($.inArray( str.substr(0, str.length-8), this.municipalities ) > -1)
+                        return true;
+                }
+
+                // Second check
+                if(str.substr(-7) == ' kommun') {
+                    return $.inArray( str.substr(0, str.length-7), this.municipalities ) > -1;
+                }
+
+                return false;
+            }
+            else
+                return true;
         },
         errorMessage : '',
         errorMessageKey: 'badCustomVal',
-        municipalities : ['Ale','Alingsås','Alvesta','Aneby','Arboga','Arjeplogs','Arvidsjaurs','Arvika','Askersunds','Avesta','Bengtsfors','Bergs','Bjurholms','Bjuvs','Bodens','Bollebygds','Bollnäs','Borgholms','Borlänge','Borås','Botkyrka','Boxholms','Bromölla','Bräcke','Burlövs','Båstads','Dals-Eds','Danderyds','Degerfors','Dorotea','Eda','Ekerö','Eksjö','Emmaboda','Enköpings','Eskilstuna','Eslövs','Essunga','Fagersta','Falkenbergs','Falköpings','Falu','Filipstads','Finspångs','Flens','Forshaga','Färgelanda','Gagnefs','Gislaveds','Gnesta','Gnosjö','Gotlands','Grums','Grästorps','Gullspångs','Gällivare','Gävle','Göteborgs','Götene','Habo','Hagfors','Hallsbergs','Hallstahammars','Halmstads','Hammarö','Haninge','Haparanda','Heby','Hedemora','Helsingborgs','Herrljunga','Hjo','Hofors','Huddinge','Hudiksvalls','Hultsfreds','Hylte','Håbo','Hällefors','Härjedalens','Härnösands','Härryda','Hässleholms','Höganäs','Högsby','Hörby','Höörs','Jokkmokks','Järfälla','Jönköpings','Kalix','Kalmar','Karlsborgs','Karlshamns','Karlskoga','Karlskrona','Karlstads','Katrineholms','Kils','Kinda','Kiruna','Klippans','Knivsta','Kramfors','Kristianstads','Kristinehamns','Krokoms','Kumla','Kungsbacka','Kungsörs','Kungälvs','Kävlinge','Köpings','Laholms','Landskrona','Laxå','Lekebergs','Leksands','Lerums','Lessebo','Lidingö','Lidköpings','Lilla Edets','Lindesbergs','Linköpings','Ljungby','Ljusdals','Ljusnarsbergs','Lomma','Ludvika','Luleå','Lunds','Lycksele','Lysekils','Malmö','Malung-Sälens','Malå','Mariestads','Marks','Markaryds','Melleruds','Mjölby','Mora','Motala','Mullsjö','Munkedals','Munkfors','Mölndals','Mönsterås','Mörbylånga','Nacka','Nora','Norbergs','Nordanstigs','Nordmalings','Norrköpings','Norrtälje','Norsjö','Nybro','Nykvarns','Nyköpings','Nynäshamns','Nässjö','Ockelbo','Olofströms','Orsa','Orusts','Osby','Oskarshamns','Ovanåkers','Oxelösunds','Pajala','Partille','Perstorps','Piteå','Ragunda','Robertsfors','Ronneby','Rättviks','Sala','Salems','Sandvikens','Sigtuna','Simrishamns','Sjöbo','Skara','Skellefteå','Skinnskattebergs','Skurups','Skövde','Smedjebackens','Sollefteå','Sollentuna','Solna','Sorsele','Sotenäs','Staffanstorps','Stenungsunds','Stockholms','Storfors','Storumans','Strängnäs','Strömstads','Strömsunds','Sundbybergs','Sundsvalls','Sunne','Surahammars','Svalövs','Svedala','Svenljunga','Säffle','Säters','Sävsjö','Söderhamns','Söderköpings','Södertälje','Sölvesborgs','Tanums','Tibro','Tidaholms','Tierps','Timrå','Tingsryds','Tjörns','Tomelilla','Torsby','Torsås','Tranemo','Tranås','Trelleborgs','Trollhättans','Trosa','Tyresö','Täby','Töreboda','Uddevalla','Ulricehamns','Umeå','Upplands Väsby','Upplands-Bro','Uppsala','Uppvidinge','Vadstena','Vaggeryds','Valdemarsviks','Vallentuna','Vansbro','Vara','Varbergs','Vaxholms','Vellinge','Vetlanda','Vilhelmina','Vimmerby','Vindelns','Vingåkers','Vårgårda','Vänersborgs','Vännäs','Värmdö','Värnamo','Västerviks','Västerås','Växjö','Ydre','Ystads','Åmåls','Ånge','Åre','Årjängs','Åsele','Åstorps','Åtvidabergs','Älmhults','Älvdalens','Älvkarleby','Älvsbyns','Ängelholms','Öckerö','Ödeshögs','Örebro','Örkelljunga','Örnsköldsviks','Östersunds','Österåkers','Östhammars','Östra Göinge','Överkalix','Övertorneå']
+        municipalities : ['ale','alingsås','alvesta','aneby','arboga','arjeplog','arvidsjaur','arvika','askersund','avesta','bengtsfors','berg','bjurholm','bjuv','boden','bollebygd','bollnäs','borgholm','borlänge','borås','botkyrka','boxholm','bromölla','bräcke','burlöv','båstad','dals-ed','danderyd','degerfors','dorotea','eda','ekerö','eksjö','emmaboda','enköpings','eskilstuna','eslövs','essunga','fagersta','falkenberg','falköping','falu','filipstad','finspång','flen','forshaga','färgelanda','gagnef','gislaved','gnesta','gnosjö','gotland','grum','grästorp','gullspång','gällivare','gävle','göteborg','götene','habo','hagfor','hallsberg','hallstahammar','halmstad','hammarö','haninge','haparanda','heby','hedemora','helsingborg','herrljunga','hjo','hofor','huddinge','hudiksvall','hultsfred','hylte','håbo','hällefor','härjedalen','härnösand','härryda','hässleholm','höganäs','högsby','hörby','höör','jokkmokk','järfälla','jönköping','kalix','kalmar','karlsborg','karlshamn','karlskoga','karlskrona','karlstad','katrineholm','kil','kinda','kiruna','klippan','knivsta','kramfors','kristianstad','kristinehamn','krokoms','kumla','kungsbacka','kungsör','kungälv','kävlinge','köping','laholm','landskrona','laxå','lekeberg','leksand','lerum','lessebo','lidingö','lidköping','lilla edets','lindesbergs','linköpings','ljungby','ljusdals','ljusnarsbergs','lomma','ludvika','luleå','lunds','lycksele','lysekil','malmö','malung-sälen','malå','mariestad','marks','markaryd','mellerud','mjölby','mora','motala','mullsjö','munkedal','munkfors','mölndal','mönsterås','mörbylånga','nacka','nora','norberg','nordanstig','nordmaling','norrköping','norrtälje','norsjö','nybro','nykvarn','nyköping','nynäshamn','nässjö','ockelbo','olofström','orsa','orust','osby','oskarshamn','ovanåker','oxelösund','pajala','partille','perstorp','piteå','ragunda','robertsfors','ronneby','rättvik','sala','salem','sandviken','sigtuna','simrishamn','sjöbo','skara','skellefteå','skinnskatteberg','skurup','skövde','smedjebacken','sollefteå','sollentuna','solna','sorsele','sotenäs','staffanstorp','stenungsund','stockholm','storfors','storuman','strängnäs','strömstad','strömsund','sundbyberg','sundsvall','sunne','surahammar','svalöv','svedala','svenljunga','säffle','säter','sävsjö','söderhamns','söderköping','södertälje','sölvesborg','tanum','tibro','tidaholm','tierp','timrå','tingsryd','tjörn','tomelilla','torsby','torså','tranemo','tranå','trelleborg','trollhättan','trosa','tyresö','täby','töreboda','uddevalla','ulricehamns','umeå','upplands väsby','upplands-bro','uppsala','uppvidinge','vadstena','vaggeryd','valdemarsvik','vallentuna','vansbro','vara','varberg','vaxholm','vellinge','vetlanda','vilhelmina','vimmerby','vindeln','vingåker','vårgårda','vänersborg','vännäs','värmdö','värnamo','västervik','västerås','växjö','ydre','ystad','åmål','ånge','åre','årjäng','åsele','åstorp','åtvidaberg','älmhult','älvdalen','älvkarleby','älvsbyn','ängelholm','öckerö','ödeshög','örebro','örkelljunga','örnsköldsvik','östersund','österåker','östhammar','östra göinge','överkalix','övertorneå']
     });
+
+    /**
+     * @private
+     * @param {Array} listItems
+     * @return {Array}
+     */
+    var _makeSortedList = function(listItems) {
+        var newList = [];
+        $.each(listItems, function(i, v) {
+            newList.push(v.substr(0,1).toUpperCase() + v.substr(1, v.length));
+        });
+        newList.sort();
+        return newList;
+    };
+
+    $.fn.suggestSwedishCounty = function(settings) {
+        var counties = _makeSortedList($.formUtils.validators.validate_swecounty.counties);
+        return $.formUtils.suggest(this, counties, settings);
+    };
+
+    $.fn.suggestSwedishMunicipality = function(settings) {
+        var municipalities = _makeSortedList($.formUtils.validators.validate_swemunicipality.municipalities);
+        return $.formUtils.suggest(this, municipalities, settings);
+    };
 
 })(jQuery);
