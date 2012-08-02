@@ -908,8 +908,13 @@
     */
     $.formUtils.addValidator({
         name : 'validate_domain',
-        validate : function(val) {
+        validate : function(val, $input) {
+
+            // Clean up
             val = val.replace('ftp://', '').replace('https://', '').replace('http://', '').replace('www.', '');
+            if(val.substr(-1) == '/')
+                val = val.substr(0, val.length-1);
+
             var arr = new Array('.com', '.net', '.org', '.biz', '.coop', '.info', '.museum', '.name', '.pro',
                                 '.edu', '.gov', '.int', '.mil', '.ac', '.ad', '.ae', '.af', '.ag', '.ai', '.al',
                                 '.am', '.an', '.ao', '.aq', '.ar', '.as', '.at', '.au', '.aw', '.az', '.ba', '.bb',
@@ -985,6 +990,11 @@
                 }
             }
 
+            // It's valid, lets update input with trimmed value perhaps??
+            if(typeof $input !== 'undefined') {
+                $input.val(val);
+            }
+
             return true;
         },
         errorMessage : '',
@@ -1010,6 +1020,12 @@
         name : 'validate_length',
         validate : function(value, $el, config, language) {
             var len = $el.attr('data-validation-length');
+            if(len == undefined) {
+                var elementType = $el.get(0).nodeName;
+                alert('Please add attribute "data-validation-length" to '+elementType+' named '+$el.attr('name'));
+                return true;
+            }
+
             var range = len.split('-');
 
             // range
@@ -1017,6 +1033,7 @@
                 this.errorMessage = language.badLength + len + language.toLongEnd;
                 return false;
             }
+            // min
             else if(len.indexOf('min') === 0) {
                 var minLength = parseInt(len.substr(3),10);
                 if(minLength > value.length) {
@@ -1024,16 +1041,13 @@
                     return false;
                 }
             }
+            // max
             else if(len.indexOf('max') === 0) {
                 var maxLength = parseInt(len.substr(3),10);
                 if(maxLength < value.length) {
                     this.errorMessage = language.toLongStart + maxLength + language.toLongEnd;
                     return false;
                 }
-            }
-            else {
-                var elementType = $el.get(0).nodeName;
-                alert('Please add attribute "data-validation-length" to '+elementType+' named '+$el.attr('name'));
             }
 
             return true;
