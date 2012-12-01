@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>jQuery Form Validator v2.0</title>
+
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <link rel="stylesheet" href="bootstrap.min.css" type="text/css" />
+
+    <style>
+        #logo {
+            color: #F9F9F9;
+            font-weight: bold;
+        }
+        #tabs {
+            margin-top: 60px;
+        }
+        .container {
+            width: auto;
+            max-width: 940px;
+            padding: 0 20px;
+        }
+        .tab-pane {
+            padding: 20px;
+        }
+
+        .control-label span {
+            font-size: 85%;
+            display: block;
+            padding-top: 4px;
+            color: #777;
+        }
+
+        /* Form validator */
+
+        .jquery_form_error_message,
+        .jquery_form_help {
+            display: block !important;
+            float: none;
+            font-size: 85% !important;
+            color: red;
+            padding-top: 4px;
+        }
+
+        input.error, textarea.error {
+            background: #ffebef;
+        }
+
+        .jquery_form_help {
+            color: #777;
+            font-style: italic;
+        }
+
+        .form-suggest-element {
+            padding: 4px;
+        }
+
+        form.validating-backend {
+            background: url(ajax-loader.gif) no-repeat center center;
+        }
+
+        form.validating-backend div {
+            opacity: 0.5;
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="brand" href="./index.html" id="logo">jQuery Form Validator 2.0</a>
+                </div>
+            </div>
+        </div>
+        <nav>
+            <ul class="nav nav-tabs" id="tabs">
+                <li class="active"><a href="#home">Home</a></li>
+                <li><a href="#security">Security</a></li>
+                <li><a href="#location">Location</a></li>
+                <li><a href="#date">Date</a></li>
+                <li><a href="#other">Other</a></li>
+                <li><a href="#custom">Custom validators</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="home">
+            <h1>Lorem te ipsum</h1>
+            <p>
+                Lorem te ipsum del tara sinco sei
+            </p>
+            <form class="form-horizontal" action="" method="POST" id="home-form">
+                <fieldset>
+                    <div id="legend">
+                        <legend class="">Register</legend>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="username">User name</label>
+                        <div class="controls">
+                            <input type="text" id="username"
+                                   name="username"
+                                   data-validation="length custom"
+                                   data-validation-length="4-12"
+                                   data-validation-regexp="^([a-zA-Z0-9]+)$"
+                                   data-validation-help="The user name has to contain between 4-12 characters, only letters A-Z and numbers"
+                                   class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="country">Country</label>
+                        <div class="controls">
+                            <input type="text" id="country" name="pass"
+                                   data-validation="country"
+                                   class="input-xlarge country">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="email">E-mail</label>
+                        <div class="controls">
+                            <input type="text" id="email" name="email" data-validation="email" class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="password">Password</label>
+                        <div class="controls">
+                            <input type="password" id="password" name="pass"
+                                   data-validation="required confirmation"
+                                   class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label"  for="password_confirm">Confirm password</label>
+                        <div class="controls">
+                            <input type="password" id="password_confirm" name="pass_confirmation" class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="birth">Birth date</label>
+                        <div class="controls">
+                            <input type="text" id="birth" name="pass"
+                                   data-validation="birthdate"
+                                   data-validation-help="The date should be formatted dd/mm/yyyy"
+                                   class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <!-- Button -->
+                        <div class="controls">
+                            <input type="submit" class="btn btn-success" value="Validate form" />
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="tab-pane" id="security">
+            <h1>Security</h1>
+            <form class="form-horizontal" action="" method="POST" id="security-form">
+                <fieldset>
+                    <div>
+                        <legend class="">Lorem te ipsum</legend>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="password2">
+                            Password
+                            <span>Has to be a good password</span>
+                        </label>
+                        <div class="controls">
+                            <input type="password" id="password2" name="pass"
+                                   data-validation="confirmation strength"
+                                   data-validation-strength="2"
+                                   class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label"  for="password_confirm">Confirm password</label>
+                        <div class="controls">
+                            <input type="password" id="password_confirm2" name="pass_confirmation" class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="backend">Validate on backend</label>
+                        <div class="controls">
+                            <input type="text" id="backend" name="pass"
+                                   data-validation="backend"
+                                   data-validation-url="validate-email.php"
+                                   class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="catpcha">What is the sum of 3+5?</label>
+                        <div class="controls">
+                            <input type="text" id="catpcha" name="pass"
+                                   data-validation="spamcheck"
+                                   data-validation-captcha="8"
+                                   class="input-xlarge">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <!-- Button -->
+                        <div class="controls">
+                            <input type="submit" class="btn btn-success" value="Validate form" />
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+
+        </div>
+        <div class="tab-pane" id="location">
+
+            <h2>Lore te ipsum</h2>
+
+        </div>
+        <div class="tab-pane" id="date">...4</div>
+        <div class="tab-pane" id="other">...5</div>
+        <div class="tab-pane" id="custom">...6</div>
+    </div>
+
+    <footer>
+
+    </footer>
+
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="../js/form-validator/jquery.formvalidator.js"></script>
+<script src="bootstrap.min.js"></script>
+<script>
+
+    $.formUtils.loadModules('date.dev, security.dev, location.dev, date.dev');
+
+    var $links = $('#tabs a');
+    $links.click(function() {
+        $(this).tab('show');
+    });
+    if ( document.location.hash ) {
+        $links.filter('*[href="'+document.location.hash+'"]').tab('show');
+    }
+
+    // Add validation to all forms on page
+    $('form')
+        .validateOnBlur()
+        .showHelpOnFocus()
+        .on('submit', function() {
+            var $form = $(this);
+            var valid = $form.validate(false, {
+                        errorMessagePosition : 'element',
+                        dateFormat : 'dd/mm/yyyy'
+                    });
+
+            // No multiple submissions
+            $form.find('input[type="submit"]').bind('click', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            if( !$.formUtils.haltValidation ) {
+                // if "validate_backend" is encountered the form will be validated
+                // twice, the first time $.formUtils.haltValidation will be set to true
+                if( valid ) {
+                    alert('Form is valid :)');
+                } else {
+                    alert('Form is not valid :(');
+                }
+
+                $form.find('input[type="submit"]').unbind('click');
+            }
+
+            return false;
+        });
+
+    // When all modules is loaded
+    $.formUtils.on('load', function() {
+        $('input.country').suggestCountry();
+        $('#password2').displayPasswordStrength()
+    });
+
+</script>
+
+
+</body>
+</html>
