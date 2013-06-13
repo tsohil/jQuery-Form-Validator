@@ -42,25 +42,26 @@
             var $element = $(this);
             var help = $element.attr(attrName);
             if(help) {
+                var className = 'jquery_form_help_' + $element.attr('name');
                 $element
                     .focus(function() {
-                        var $element = $(this);
-                        if($element.parent().find('.jquery_form_help').length == 0) {
-                            var $span = $('<span />')
-                                            .addClass('jquery_form_help')
-                                            .text(help)
-                                            .hide()
-                                            .fadeIn();
-                            $element.after($span);
+                        var $help = $element.parent().find('.'+className);
+                        if($help.length == 0) {
+                            $help = $('<span />')
+                                        .addClass(className)
+                                        .text(help)
+                                        .hide();
+
+                            $element.after($help);
+
                         }
+                        $help.fadeIn();
                     })
                     .blur(function() {
                         $(this)
                             .parent()
-                            .find('.jquery_form_help')
-                                .fadeOut('slow', function() {
-                                    $(this).remove();
-                                });
+                            .find('.'+className)
+                                .fadeOut('slow');
                     });
             }
         });
@@ -136,7 +137,7 @@
 
         if(validationRule && validationRule.indexOf('confirmation') > -1) {
             var validateWhenBlurred = function($element) {
-                var $confirm = $form.find('input[name=' + $element.attr('name') + '_confirmation]').eq(0);
+                var $confirm = $form.find('input[name="' + $element.attr('name') + '_confirmation"]').eq(0);
                 $confirm.one('blur', function() {
                     $element.doValidate(language, settings, false);
                 });
@@ -197,36 +198,17 @@
      * Function that validate all inputs in a form
      *
      * @param language
-     * @param settings
+     * @param config
      */
-    $.fn.validate = function(language, settings) {
+    $.fn.validate = function(language, config) {
 
-        /*
-         * Config
-         */
-        var config = {
-            ignore : [], // Names of inputs not to be validated even though node attribute containing the validation rules tells us to
-            errorElementClass : 'error', // Class that will be put on elements which value is invalid
-            borderColorOnError : 'red', // Border color of elements which value is invalid, empty string to not change border color
-            errorMessageClass : 'jquery_form_error_message', // class name of div containing error messages when validation fails
-            validationRuleAttribute : 'data-validation', // name of the attribute holding the validation rules
-            validationErrorMsgAttribute : 'data-validation-error-msg', // define custom err msg inline with element
-            errorMessagePosition : 'top', // Can be either "top" or "element"
-            scrollToTopOnError : true,
-            dateFormat : 'yyyy-mm-dd'
-        };
+        if(!config)
+            config = {};
+        if(!language)
+            language = {};
 
-        /*
-         * Extends initial settings
-         */
-        if (settings) {
-            $.extend(config, settings);
-        }
-        if (language) {
-            $.extend($.formUtils.LANG, language);
-        }
-        // get updated dialog strings
-        language = $.formUtils.LANG;
+        $.extend(language, $.formUtils.LANG);
+        $.extend(config, $.formUtils.defaultConfig);
 
         /**
          * Adds message to error message stack if not already in the message stack
@@ -283,7 +265,7 @@
                     if (typeof validationRule != 'undefined' && validationRule === 'required') {
                         var radioButtonName = $element.attr('name');
                         var isChecked = false;
-                        $form.find('input[name=' + radioButtonName + ']').each(function() {
+                        $form.find('input[name="' + radioButtonName + '"]').each(function() {
                             if ($(this).is(':checked')) {
                                 isChecked = true;
                                 return false;
@@ -405,6 +387,21 @@
     $.formUtils = {
 
         /**
+         * Default config for $(...).validate();
+         */
+        defaultConfig :  {
+            ignore : [], // Names of inputs not to be validated even though node attribute containing the validation rules tells us to
+            errorElementClass : 'error', // Class that will be put on elements which value is invalid
+            borderColorOnError : 'red', // Border color of elements which value is invalid, empty string to not change border color
+            errorMessageClass : 'jquery_form_error_message', // class name of div containing error messages when validation fails
+            validationRuleAttribute : 'data-validation', // name of the attribute holding the validation rules
+            validationErrorMsgAttribute : 'data-validation-error-msg', // define custom err msg inline with element
+            errorMessagePosition : 'top', // Can be either "top" or "element"
+            scrollToTopOnError : true,
+            dateFormat : 'yyyy-mm-dd'
+        },
+
+        /**
         * Default border color, will be picked up first
         * time form is validated
         */
@@ -432,7 +429,8 @@
         * @param {Object} validator
         */
         addValidator : function(validator) {
-            this.validators[validator.name] = validator;
+            var name = validator.name.indexOf('validate_') === 0 ? validator.name : 'validate_'+validator.name;
+            this.validators[name] = validator;
         },
 
         /**
@@ -508,18 +506,18 @@
                 loadModuleScripts(modules, path);
             else {
                 $(function() {
-                    var scripts = $('script');
-                    for(var i=0; i < scripts.length; i++) {
-                        var src = scripts.eq(i).attr('src');
+                    $('script').each(function() {
+                        var src = $(this).attr('src');
                         var scriptName = src.substr(src.lastIndexOf('/')+1, src.length);
-                        if(scriptName == 'jquery.formvalidator.js' || scriptName == 'jquery.formvalidator.min.js') {
+                        if(scriptName == 'jquery.form-validator.js' || scriptName == 'jquery.form-validator.min.js') {
                             path = src.substr(0, src.lastIndexOf('/')) + '/';
                             if(path == '/')
                                 path = '';
 
-                            break;
+                            return false;
                         }
-                    }
+                    });
+
                     loadModuleScripts(modules, path);
                 });
             }
@@ -534,7 +532,7 @@
         * @param {Object} language ($.formUtils.LANG)
         * @param {Object} config
         * @param {jQuery} $form
-        * @return {String}|{Boolean}
+        * @return {String|Boolean}
         */
         validateInput : function($element, language, config, $form) {
 
@@ -594,7 +592,10 @@
                     }
 
                     var validator = $.formUtils.validators[posRules[i]];
-                    if( validator ) {
+                    console.log(posRules[i]);
+                    console.log(validator);
+
+                    if( validator && typeof validator['validate'] == 'function' ) {
 
                         var isValid = validator.validate(value, $element, config, language, $form);
                         if(!isValid) {
@@ -606,7 +607,7 @@
                             }
                             return validationErrorMsg;
                         }
-                    } else if (posRules[i].substr(9) == 'validate_' && typeof console != 'undefined' && 'warn' in console) {
+                    } else {
                         console.warn('Using undefined validator "'+posRules[i]+'"');
                     }
                 }
@@ -950,10 +951,10 @@
             badTelephone : 'You have not given a correct phone number',
             badSecurityAnswer : 'You have not given a correct answer to the security question',
             badDate : 'You have not given a correct date',
-            toLongStart : 'You have given an answer longer than ',
-            toLongEnd : ' characters',
-            toShortStart : 'You have given an answer shorter than ',
-            toShortEnd : ' characters',
+            tooLongStart : 'You have given an answer longer than ',
+            tooLongEnd : ' characters',
+            tooShortStart : 'You have given an answer shorter than ',
+            tooShortEnd : ' characters',
             badLength : 'You have to give an answer between ',
             notConfirmed : 'Values could not be confirmed',
             badDomain : 'Incorrect domain value',
@@ -1002,51 +1003,50 @@
         validate : function(val, $input) {
 
             // Clean up
+            val = val.toLowerCase();
             val = val.replace('ftp://', '').replace('https://', '').replace('http://', '').replace('www.', '');
             if(val.substr(-1) == '/')
                 val = val.substr(0, val.length-1);
 
-            var arr = new Array('.com', '.net', '.org', '.biz', '.coop', '.info', '.museum', '.name', '.pro',
-                                '.edu', '.gov', '.int', '.mil', '.ac', '.ad', '.ae', '.af', '.ag', '.ai', '.al',
-                                '.am', '.an', '.ao', '.aq', '.ar', '.as', '.at', '.au', '.aw', '.az', '.ba', '.bb',
-                                '.bd', '.be', '.bf', '.bg', '.bh', '.bi', '.bj', '.bm', '.bn', '.bo', '.br', '.bs',
-                                '.bt', '.bv', '.bw', '.by', '.bz', '.ca', '.cc', '.cd', '.cf', '.cg', '.ch', '.ci',
-                                '.ck', '.cl', '.cm', '.cn', '.co', '.cr', '.cu', '.cv', '.cx', '.cy', '.cz', '.de',
-                                '.dj', '.dk', '.dm', '.do', '.dz', '.ec', '.ee', '.eg', '.eh', '.er', '.es', '.et',
-                                '.fi', '.fj', '.fk', '.fm', '.fo', '.fr', '.ga', '.gd', '.ge', '.gf', '.gg', '.gh',
-                                '.gi', '.gl', '.gm', '.gn', '.gp', '.gq', '.gr', '.gs', '.gt', '.gu', '.gv', '.gy',
-                                '.hk', '.hm', '.hn', '.hr', '.ht', '.hu', '.id', '.ie', '.il', '.im', '.in', '.io',
-                                '.iq', '.ir', '.is', '.it', '.je', '.jm', '.jo', '.jp', '.ke', '.kg', '.kh', '.ki',
-                                '.km', '.kn', '.kp', '.kr', '.kw', '.ky', '.kz', '.la', '.lb', '.lc', '.li', '.lk',
-                                '.lr', '.ls', '.lt', '.lu', '.lv', '.ly', '.ma', '.mc', '.md', '.mg', '.mh', '.mk',
-                                '.ml', '.mm', '.mn', '.mo', '.mp', '.mq', '.mr', '.ms', '.mt', '.mu', '.mv', '.mw',
-                                '.mx', '.my', '.mz', '.na', '.nc', '.ne', '.nf', '.ng', '.ni', '.nl', '.no', '.np',
-                                '.nr', '.nu', '.nz', '.om', '.pa', '.pe', '.pf', '.pg', '.ph', '.pk', '.pl', '.pm',
-                                '.pn', '.pr', '.ps', '.pt', '.pw', '.py', '.qa', '.re', '.ro', '.rw', '.ru', '.sa',
-                                '.sb', '.sc', '.sd', '.se', '.sg', '.sh', '.si', '.sj', '.sk', '.sl', '.sm', '.sn',
-                                '.so', '.sr', '.st', '.sv', '.sy', '.sz', '.tc', '.td', '.tf', '.tg', '.th', '.tj',
-                                '.tk', '.tm', '.tn', '.to', '.tp', '.tr', '.tt', '.tv', '.tw', '.tz', '.ua', '.ug',
-                                '.uk', '.um', '.us', '.uy', '.uz', '.va', '.vc', '.ve', '.vg', '.vi', '.vn', '.vu',
-                                '.ws', '.wf', '.ye', '.yt', '.yu', '.za', '.zm', '.zw', '.me', '.mobi', '.xxx');
+            var topDomains = ['.com', '.net', '.org', '.biz', '.coop', '.info', '.museum', '.name', '.pro',
+                    '.edu', '.gov', '.int', '.mil', '.ac', '.ad', '.ae', '.af', '.ag', '.ai', '.al',
+                    '.am', '.an', '.ao', '.aq', '.ar', '.as', '.at', '.au', '.aw', '.az', '.ba', '.bb',
+                    '.bd', '.be', '.bf', '.bg', '.bh', '.bi', '.bj', '.bm', '.bn', '.bo', '.br', '.bs',
+                    '.bt', '.bv', '.bw', '.by', '.bz', '.ca', '.cc', '.cd', '.cf', '.cg', '.ch', '.ci',
+                    '.ck', '.cl', '.cm', '.cn', '.co', '.cr', '.cu', '.cv', '.cx', '.cy', '.cz', '.de',
+                    '.dj', '.dk', '.dm', '.do', '.dz', '.ec', '.ee', '.eg', '.eh', '.er', '.es', '.et',
+                    '.fi', '.fj', '.fk', '.fm', '.fo', '.fr', '.ga', '.gd', '.ge', '.gf', '.gg', '.gh',
+                    '.gi', '.gl', '.gm', '.gn', '.gp', '.gq', '.gr', '.gs', '.gt', '.gu', '.gv', '.gy',
+                    '.hk', '.hm', '.hn', '.hr', '.ht', '.hu', '.id', '.ie', '.il', '.im', '.in', '.io',
+                    '.iq', '.ir', '.is', '.it', '.je', '.jm', '.jo', '.jp', '.ke', '.kg', '.kh', '.ki',
+                    '.km', '.kn', '.kp', '.kr', '.kw', '.ky', '.kz', '.la', '.lb', '.lc', '.li', '.lk',
+                    '.lr', '.ls', '.lt', '.lu', '.lv', '.ly', '.ma', '.mc', '.md', '.me', '.mg', '.mh',
+                    '.mk', '.ml', '.mm', '.mn', '.mo', '.mp', '.mq', '.mr', '.ms', '.mt', '.mu', '.mv',
+                    '.mw', '.mx', '.my', '.mz', '.na', '.nc', '.ne', '.nf', '.ng', '.ni', '.nl', '.no',
+                    '.np', '.nr', '.nu', '.nz', '.om', '.pa', '.pe', '.pf', '.pg', '.ph', '.pk', '.pl',
+                    '.pm', '.pn', '.pr', '.ps', '.pt', '.pw', '.py', '.qa', '.re', '.ro', '.rs', '.rw',
+                    '.ru', '.sa', '.sb', '.sc', '.sd', '.se', '.sg', '.sh', '.si', '.sj', '.sk', '.sl',
+                    '.sm', '.sn', '.so', '.sr', '.st', '.sv', '.sy', '.sz', '.tc', '.td', '.tf', '.tg',
+                    '.th', '.tj', '.tk', '.tm', '.tn', '.to', '.tp', '.tr', '.tt', '.tv', '.tw', '.tz',
+                    '.ua', '.ug', '.uk', '.um', '.us', '.uy', '.uz', '.va', '.vc', '.ve', '.vg', '.vi',
+                    '.vn', '.vu', '.ws', '.wf', '.ye', '.yt', '.za', '.zm', '.zw', '.mobi', '.xxx', '.asia'],
 
-            var dot = val.lastIndexOf('.');
-            var domain = val.substring(0, dot);
-            var ext = val.substring(dot, val.length);
-            var hasTopDomain = false;
+                ukTopDomains = ['co', 'me', 'ac', 'gov', 'judiciary','ltd', 'mod', 'net', 'nhs', 'nic',
+                        'org', 'parliament', 'plc', 'police', 'sch', 'bl', 'british-library', 'jet','nls'],
 
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i] === ext) {
+                dot = val.lastIndexOf('.'),
+                domain = val.substring(0, dot),
+                ext = val.substring(dot, val.length),
+                hasTopDomain = false;
+
+            for (var i = 0; i < topDomains.length; i++) {
+                if (topDomains[i] === ext) {
                     if(ext==='.uk') {
                         //Run Extra Checks for UK Domain Names
                         var domainParts = val.split('.');
                         var tld2 = domainParts[domainParts.length-2];
-                        var ukarr = new Array('co', 'me', 'ac', 'gov', 'judiciary',
-                        'ltd', 'mod', 'net', 'nhs', 'nic', 'org', 'parliament',
-                        'plc', 'police', 'sch', 'bl', 'british-library', 'jet',
-                        'nls');
-
-                        for(var j = 0; j < ukarr.length; j++) {
-                            if(ukarr[j] === tld2) {
+                        for(var j = 0; j < ukTopDomains.length; j++) {
+                            if(ukTopDomains[j] === tld2) {
                                 hasTopDomain = true;
                                 break;
                             }
@@ -1121,14 +1121,14 @@
 
             // range
             if(range.length == 2 && (value.length < parseInt(range[0],10) || value.length > parseInt(range[1],10))) {
-                this.errorMessage = language.badLength + len + language.toLongEnd;
+                this.errorMessage = language.badLength + len + language.tooLongEnd;
                 return false;
             }
             // min
             else if(len.indexOf('min') === 0) {
                 var minLength = parseInt(len.substr(3),10);
                 if(minLength > value.length) {
-                    this.errorMessage = language.toShortStart + minLength + language.toShortEnd;
+                    this.errorMessage = language.tooShortStart + minLength + language.tooShortEnd;
                     return false;
                 }
             }
@@ -1136,7 +1136,7 @@
             else if(len.indexOf('max') === 0) {
                 var maxLength = parseInt(len.substr(3),10);
                 if(maxLength < value.length) {
-                    this.errorMessage = language.toLongStart + maxLength + language.toLongEnd;
+                    this.errorMessage = language.tooLongStart + maxLength + language.tooLongEnd;
                     return false;
                 }
             }

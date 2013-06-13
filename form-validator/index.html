@@ -9,10 +9,8 @@
 -->
 <title>jQuery Form Validator - Tests</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script src="jquery.formvalidator.js"></script>
+<script src="jquery.form-validator.js"></script>
 <script>
-
-$.formUtils.loadModules('date.dev, location.dev, security.dev, sweden.dev, uk.dev');
 
 function input(val, dataValidationAttr, elAttr) {
     if(!elAttr)
@@ -26,6 +24,8 @@ function input(val, dataValidationAttr, elAttr) {
     elAttr['value'] = val;
     return $('<input />', elAttr);
 }
+
+$.formUtils.loadModules('date.dev, location.dev, security.dev, sweden.dev, uk.dev');
 
 var testSuites = [
     {
@@ -84,7 +84,8 @@ var testSuites = [
                 {val:input('1234', {'length':'min5'}, {name:4}), isValid:false},
                 {val:input('1234', {'length':'2-35'}, {name:3}), isValid:true},
                 {val:input('123456', {'length':'2-5'}, {name:3}), isValid:false},
-                {val:input('1234', {'length':'max4'}, {name:1}), isValid:true}
+                {val:input('1234', {'length':'max4'}, {name:1}), isValid:true},
+                {val:input('1234', {length : 'min5'}, {'data-validation':'validate_number validate_length'}), isValid:false}
             ];
         }
     }
@@ -94,21 +95,33 @@ var testSuites = [
 
 $(function() {
 
-    var $body = $('body');
-    var numFinishedTests = 0;
-    var numFailedTests = 0;
-    var message = '';
+    var $body = $('body'),
+        numFinishedTests = 0,
+        numFailedTests = 0,
+        message = '';
 
-    var runtTest = function(validationTest) {
-        var $input;
+    function runtTest(validationTest, validator) {
+        var $input,
+            $form;
+
         if(typeof validationTest.val == 'string') {
-            $input = $('<input />', {type:'text',value:validationTest.val});
+            $input = $('<input />', {type:'text', value:validationTest.val});
+            $input.attr('data-validation', validator.name);
         }
         else {
             $input = validationTest.val;
+            if( !$input.attr('data-validation') ) {
+                $input.attr('data-validation', validator.name);
+            }
+        }
+        if( validationTest.$form ) {
+            $form = validationTest.$form;
+        } else {
+            $form = $('<form></form>');
+            $form.append($input);
         }
 
-        var result = validator.validate($input.val(), $input, false, false, $('<form></form>'));
+        var result = $.formUtils.validateInput($input, $.formUtils.LANG, $.formUtils.defaultConfig, $form);
         var wasValid = result === true;
 
         // output
@@ -128,16 +141,15 @@ $(function() {
             $body.append('<p>'+message+'</p>');
         }
         numFinishedTests++;
-    };
-
-    for(var i=0; i < testSuites.length; i++) {
-        var validator = $.formUtils.validators[testSuites[i].validator];
-        var tests = testSuites[i].tests();
-
-        for(var j=0; j < tests.length; j++) {
-            runtTest(tests[j]);
-        }
     }
+
+    $.each(testSuites, function(i, suite) {
+        var validator = $.formUtils.validators[suite.validator];
+
+        $.each(suite.tests(), function(j,test) {
+            runtTest(test, validator);
+        });
+    });
 
     var endMessage = '<h3>All '+numFinishedTests+' tests has finished</h3>';
     if(numFailedTests == 0) {

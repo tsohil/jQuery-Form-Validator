@@ -1,14 +1,8 @@
-<<<<<<< .merge_file_MDtscE
-This plugin was created to minimize javascript logic in the html code when dealing with front-end validation of form data. 
-
-[Live example can be viewed here](http://victorjonsson.se/jquery-form-validator/?from=github)
-=======
-**jQuery Form Validator** is a feature rich jQuery plugin that makes it easy to validate user input in HTML forms
-while keeping your markup clean from javascript code. Even though this plugin has **a wide range of validation functions**
-it's designed to require as little bandwidth as possible (which makes it very suitable for **mobile websites**).
-This is achieved by grouping together validation functions in "modules", making it possible for the programmer
-to load **only those functions that's needed** to validate a particular form.
->>>>>>> .merge_file_lzk9nf
+**jQuery Form Validator** is a feature rich jQuery plugin that makes it easy to validate user input while keeping your
+ HTML markup clean from javascript code. Even though this plugin has **a wide range of validation functions**
+it's designed to require as little bandwidth as possible. This is achieved by grouping together validation functions
+in "modules", making it possible for the programmer to load **only those functions that's needed** to validate a
+particular form.
 
 *Usage example*
 
@@ -16,7 +10,7 @@ to load **only those functions that's needed** to validate a particular form.
 <html>
 <head>
   <script src="js/jquery.min.js"></script>
-  <script src="js/formvalidator/jquery.formvalidator.min.js"></script>
+  <script src="js/form-validator/jquery.form-validator.min.js"></script>
   <script>
   	$.formUtils.loadModules('date,security');
   </script>
@@ -50,13 +44,10 @@ to load **only those functions that's needed** to validate a particular form.
  * **validate_int**
  * **validate_date** — *yyyy-mm-dd (format can be customized, more information below)*
  * **validate_length** — *Validate that input length is in given range (length3-20)*
-<<<<<<< .merge_file_MDtscE
  * **validate_confirmation**
  * **validate_spamcheck**
  * **validate_ukvatnumber**
  * **validate_swesec** — *validate swedish social security number*
-=======
->>>>>>> .merge_file_lzk9nf
  * **required** — *no validation except that a value has to be given*
  * **validate_custom** — *Validate value against regexp (validate_custom regexp/^[a-z]{2} [0-9]{2}$/)
  * **validate_num_answers** — *Validate that a select element has the required number of selected options (validate_num_answers num5)*
@@ -92,10 +83,7 @@ to load **only those functions that's needed** to validate a particular form.
 ### Misc (part of core)
  * Show help information automatically when input is focused
  * Validate given values immediately when input is blurred.
-<<<<<<< .merge_file_MDtscE
- * Make validation optional by adding attribute data-validation-optional="true" to the element. This means that the validation defined in data-validation only will take place in case a value is given.
  * Make validation dependent on another input of type checkbox being checked by adding attribute data-validation-if-checked="name of checkbox input"
-=======
  * Make validation optional by adding attribute data-validation-optional="true" to the element. This means
  that the validation defined in data-validation only will take place in case a value is given.
  * Make validation dependent on another input of type checkbox being checked by adding attribute
@@ -179,8 +167,6 @@ caches the javascript).
 The second argument is the path where the module files is located. This argument is optional, if not given
 the module files has to be located in the same directory as the core modules shipped together with this jquery plugin
 (js/formvalidator/)
->>>>>>> .merge_file_lzk9nf
-
 
 ## Validate inputs on blur
 It is possible to show that the value of an input is incorrect immediately when the input gets blurred.
@@ -204,13 +190,8 @@ It is possible to display help information for each input. The information will 
 ```html
 <form action="" onsubmit="return $(this).validate();" id="my_form">
 	<p>
-<<<<<<< .merge_file_MDtscE
 	  <strong>Why not:</strong>
 	  <textarea name="why" data-validation-help="Please give us some more information" data-validation="required"></textarea>
-=======
-	  <strong>Why not?</strong>
-	  <textarea data-help="Please give us some more information" data-validation="required"></textarea>
->>>>>>> .merge_file_lzk9nf
 	</p>
 	...
 </form>
@@ -274,7 +255,7 @@ $('#my_form')
 ## Localization
 This plugin contains a set of error dialogs. In case you don't define an inline error message the plugin
 will fall back on one of the dialogs below. You can how ever add the attribute *data-validation-error-msg* to an
-element, and that message will be displayed instead.  All error dialogs can be overwritten by passing an
+element, and that message will be displayed instead. All error dialogs can be overwritten by passing an
 object into the validation function.
 
 ```javascript
@@ -317,7 +298,7 @@ var enErrorDialogs = {
     ...
 ```
 
-Inline error messages is also possible. If you add attribute data-validation-error-msg to an element the value of that attribute will be displayed instead of the error dialog that the validation function referrs to.
+Inline error messages is also possible. If you add attribute data-validation-error-msg to an element the value of that attribute will be displayed instead of the error dialog that the validation function refers to.
 
 ## Simple captcha example
 ```php
@@ -361,27 +342,25 @@ $_SESSION['captcha'] = array( mt_rand(0,9), mt_rand(1, 9) );
   <p>Confirm password: <input type="password" name="pass_confirmation" /></p>
 ```
 
-<<<<<<< .merge_file_MDtscE
-## Credits
-[Victor Jonsson](https://github.com/victorjonsson)<br />
-=======
 ## Changelog
 
-### 2.0
+#### 2.0
  * validate_[min|max]_length is removed (now merged with validate_length)
  * validate_number, validate_int, validate_float is merged together, all three variants is now validated by validate_number
  * validate_phone moved to "sweden" module and renamed to validate_swephone
- * The attribute to be used when defining the regular expression for validate_custom is now moved to its own attribute
+ * The attribute to be used when defining the regular expression for validate_custom is now moved to its own attribute (data-validation-regexp)
  * validate_length now looks at attribute data-validation-length to find out how long or short the value must be
+ * The validation rule no longer needs to be prefixed with "validate_"
+ * Some validation functions is moved to modules (see function reference in top of this document)
+
+## Maintainer
+
+[Victor Jonsson](https://github.com/victorjonsson)
 
 ## Contributors
->>>>>>> .merge_file_lzk9nf
 [Joel Sutherland](https://github.com/robamaton) (contributor)<br />
 [Steve Wasiura](https://github.com/stevewasiura) (contributor)<br />
 [Matt Clements](https://github.com/mattclements) (contributor)<br />
 [dfcplc](https://github.com/dfcplc) (contributor)<br />
-<<<<<<< .merge_file_MDtscE
-=======
 [Darren Mason](http://www.mypocket-technologies.com) (Password strength meter)<br />
->>>>>>> .merge_file_lzk9nf
 [Scott Gonzales](http://projects.scottsplayground.com/iri/) (URL regexp)

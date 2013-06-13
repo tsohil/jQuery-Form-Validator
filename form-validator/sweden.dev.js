@@ -57,31 +57,6 @@
         errorMessageKey: 'badSecurityNumber'
     });
 
-
-    /*
-    * Validate that string is a swedish telephone number
-    */
-    $.formUtils.addValidator({
-        name : 'validate_swemobile',
-        validate : function(number) {
-            if (!$.formUtils.validators.validate_phone.validate(number)) {
-                return false;
-            }
-
-            number = number.replace(/[^0-9]/g, '');
-            var begin = number.substring(0, 3);
-
-            if (number.length != 10 && begin !== '467') {
-                return false;
-            } else if (number.length != 11 && begin === '467') {
-                return false;
-            }
-            return (/07[0-9{1}]/).test(begin) || (begin === '467' && number.substr(3, 1) === '0');
-        },
-        errorMessage : '',
-        errorMessageKey: 'badTelephone'
-    });
-
     $.formUtils.addValidator({
         name : 'validate_swecounty',
         validate : function(str) {
@@ -167,6 +142,31 @@
 
             tele = tele.replace(/([-|\+])/g, '');
             return tele.length > 8 && tele.match(/[^0-9]/g) === null;
+        },
+        errorMessage : '',
+        errorMessageKey: 'badTelephone'
+    });
+
+
+    /*
+     * Validate that string is a swedish telephone number
+     */
+    $.formUtils.addValidator({
+        name : 'validate_swemobile',
+        validate : function(number) {
+            if (!$.formUtils.validators.validate_swephone.validate(number)) {
+                return false;
+            }
+
+            number = number.replace(/[^0-9]/g, '');
+            var begin = number.substring(0, 3);
+
+            if (number.length != 10 && begin !== '467') {
+                return false;
+            } else if (number.length != 11 && begin === '467') {
+                return false;
+            }
+            return (/07[0-9{1}]/).test(begin) || (begin === '467' && number.substr(3, 1) === '0');
         },
         errorMessage : '',
         errorMessageKey: 'badTelephone'
