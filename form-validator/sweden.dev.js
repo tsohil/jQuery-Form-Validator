@@ -21,7 +21,7 @@
     * Validate swedish social security number yyyymmddXXXX
     */
     $.formUtils.addValidator({
-        name : 'validate_swesc',
+        name : 'validate_swesec',
         validate : function(securityNumber) {
             if (!securityNumber.match(/^(\d{4})(\d{2})(\d{2})(\d{4})$/)) {
                 return false;

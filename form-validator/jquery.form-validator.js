@@ -49,6 +49,7 @@
                         if($help.length == 0) {
                             $help = $('<span />')
                                         .addClass(className)
+                                        .addClass('form-help') // for css
                                         .text(help)
                                         .hide();
 
@@ -74,44 +75,28 @@
     * error message in a span element that is appended to the parent
     * element
     *
-    * @param {Object} language Optional, will override $.formUtils.LANG
-    * @param {Object} settings Optional, will override the default settings
-    * @param {Boolean} attachKeyupEvent Optional
+    * @param {Object} [language] Optional, will override $.formUtils.LANG
+    * @param {Object} [config] Optional, will override the default settings
+    * @param {Boolean} [attachKeyupEvent] Optional
     * @return {jQuery}
     */
-    $.fn.doValidate = function(language, settings, attachKeyupEvent) {
+    $.fn.doValidate = function(language, config, attachKeyupEvent) {
         if(typeof attachKeyupEvent == 'undefined') {
             attachKeyupEvent = true;
         }
 
         var $element = this;
+
         // test if there is custom obj to hold element error msg (id = element name + err_msg)
         var elementErrMsgObj = document.getElementById($element.attr('name')+'_err_msg');
 
-        var config = {
-            ignore : [], // Names of inputs not to be validated, overwriting attribute notaed validation
-            validationRuleAttribute : 'data-validation',
-            validationErrorMsgAttribute : 'data-validation-error-msg', // define custom err msg inline with element
-            errorElementClass : 'error', // Class that will be put on elements which value is invalid
-            borderColorOnError : 'red',
-            dateFormat : 'yyyy-mm-dd'
-        };
-
-        if (settings) {
-            $.extend(config, settings);
-        }
-        if (language) {
-            $.extend($.formUtils.LANG, language);
-        }
-        // get updated dialog strings
-        language = $.formUtils.LANG;
+        language = $.extend(language || {}, $.formUtils.LANG);
+        config = $.extend($.formUtils.defaultConfig(), config || {});
+        config.errorMessagePosition = 'element';
 
         var $form = $element.closest("form");
 
-        var elementType = $element.attr('type');
-        if ($.formUtils.defaultBorderColor === null && elementType !== 'submit' && elementType !== 'checkbox' && elementType !== 'radio') {
-            $.formUtils.defaultBorderColor = $element.css('border-color');
-        }
+        $.formUtils.figureOutDefaultBorderColor($element);
 
         var validationRule = $element.attr(config.validationRuleAttribute);
 
@@ -145,7 +130,7 @@
             validateWhenBlurred($element);
          }
 
-        var validation = $.formUtils.validateInput($element, language, config, $form);
+        var validation = $.formUtils.validateInput($element, language, config);
 
         if(validation === true) {
             $element.addClass('valid');
@@ -167,7 +152,7 @@
 
             if(attachKeyupEvent) {
                 $element.bind('keyup', function() {
-                    $(this).doValidate(language, settings, false);
+                    $(this).doValidate(language, config, false);
                 });
             }
         }
@@ -197,18 +182,13 @@
     /**
      * Function that validate all inputs in a form
      *
-     * @param language
-     * @param config
+     * @param [language]
+     * @param [config]
      */
     $.fn.validate = function(language, config) {
 
-        if(!config)
-            config = {};
-        if(!language)
-            language = {};
-
-        $.extend(language, $.formUtils.LANG);
-        $.extend(config, $.formUtils.defaultConfig);
+        language = $.extend(language || {}, $.formUtils.LANG);
+        config = $.extend($.formUtils.defaultConfig(), config || {});
 
         /**
          * Adds message to error message stack if not already in the message stack
@@ -241,13 +221,7 @@
             if (type === 'submit' || type === 'button') {
                 return true;
             }
-
-            for (var i = 0; i < config.ignore.length; i++) {
-                if (config.ignore[i] === name) {
-                    return true;
-                }
-            }
-            return false;
+            return $.inArray(name, config.ignore || []) > -1;
         };
 
         //
@@ -285,15 +259,12 @@
                 else {
 
                     // memorize border color
-                    if ($.formUtils.defaultBorderColor === null && $element.attr('type')) {
-                        $.formUtils.defaultBorderColor = $element.css('border-color');
-                    }
+                    $.formUtils.figureOutDefaultBorderColor($element);
 
                     var valid = $.formUtils.validateInput(
                                     $element,
                                     language,
-                                    config,
-                                    $form
+                                    config
                                 );
 
                     if(valid !== true) {
@@ -389,16 +360,28 @@
         /**
          * Default config for $(...).validate();
          */
-        defaultConfig :  {
-            ignore : [], // Names of inputs not to be validated even though node attribute containing the validation rules tells us to
-            errorElementClass : 'error', // Class that will be put on elements which value is invalid
-            borderColorOnError : 'red', // Border color of elements which value is invalid, empty string to not change border color
-            errorMessageClass : 'jquery_form_error_message', // class name of div containing error messages when validation fails
-            validationRuleAttribute : 'data-validation', // name of the attribute holding the validation rules
-            validationErrorMsgAttribute : 'data-validation-error-msg', // define custom err msg inline with element
-            errorMessagePosition : 'top', // Can be either "top" or "element"
-            scrollToTopOnError : true,
-            dateFormat : 'yyyy-mm-dd'
+        defaultConfig :  function() {
+            return {
+                ignore : [], // Names of inputs not to be validated even though node attribute containing the validation rules tells us to
+                errorElementClass : 'error', // Class that will be put on elements which value is invalid
+                borderColorOnError : 'red', // Border color of elements which value is invalid, empty string to not change border color
+                errorMessageClass : 'jquery_form_error_message', // class name of div containing error messages when validation fails
+                validationRuleAttribute : 'data-validation', // name of the attribute holding the validation rules
+                validationErrorMsgAttribute : 'data-validation-error-msg', // define custom err msg inline with element
+                errorMessagePosition : 'top', // Can be either "top" or "element"
+                scrollToTopOnError : true,
+                dateFormat : 'yyyy-mm-dd'
+            }
+        },
+
+        /**
+         * @param {jQuery} $element
+         */
+        figureOutDefaultBorderColor : function($element) {
+            var elementType = $element.attr('type');
+            if (this.defaultBorderColor === null && elementType !== 'submit' && elementType !== 'checkbox' && elementType !== 'radio') {
+                this.defaultBorderColor = $element.css('border-color');
+            }
         },
 
         /**
@@ -531,19 +514,14 @@
         * @param {jQuery} $element
         * @param {Object} language ($.formUtils.LANG)
         * @param {Object} config
-        * @param {jQuery} $form
         * @return {String|Boolean}
         */
-        validateInput : function($element, language, config, $form) {
+        validateInput : function($element, language, config) {
 
             // Multiple select
             if( $element.get(0).nodeName == 'SELECT' && $element.attr('multiple') ) {
                 return this.validateMultipleSelect($element.val(), $element, config, language);
             }
-
-            // Form not given as argument
-            if(!$form)
-                $form = $element.closest('form');
 
             var value = $.trim($element.val());
             value = value || '';
@@ -592,12 +570,11 @@
                     }
 
                     var validator = $.formUtils.validators[posRules[i]];
-                    console.log(posRules[i]);
-                    console.log(validator);
 
                     if( validator && typeof validator['validate'] == 'function' ) {
 
-                        var isValid = validator.validate(value, $element, config, language, $form);
+                        var isValid = validator.validate(value, $element, config, language, $element.closest('form'));
+
                         if(!isValid) {
                             $.formUtils.trigger('invalid', $element);
                             if( !validationErrorMsg ) {
