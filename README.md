@@ -4,7 +4,7 @@ it's designed to require as little bandwidth as possible. This is achieved by gr
 in "modules", making it possible for the programmer to load **only those functions that's needed** to validate a
 particular form.
 
-*Form demonstrations and full documentations is available at http://formvalidator.net/*
+**Form demos and full documentations is available at http://formvalidator.net/**
 
 *Usage example*
 
