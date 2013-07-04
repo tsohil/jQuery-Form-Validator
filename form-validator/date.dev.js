@@ -12,7 +12,7 @@
  *
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.13
+ * @version 1.9.15
  */
 (function($) {
 

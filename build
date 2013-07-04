@@ -3,8 +3,8 @@
 var fs = require('fs'),
     sys = require('sys'),
     exec = require('child_process').exec,
-    jsPath = 'js/form-validator/',
-    mainScript = jsPath + 'jquery.formvalidator.js',
+    jsPath = 'form-validator/',
+    mainScript = jsPath + 'jquery.form-validator.js',
     newVersion = -1;
 
 /*
@@ -47,7 +47,7 @@ function buildFile(path, newName) {
     });
 }
 
-buildFile(mainScript,  jsPath + 'jquery.formvalidator.min.js');
+buildFile(mainScript,  jsPath + 'jquery.form-validator.min.js');
 fs.readdirSync(jsPath).forEach(function(f) {
     if(f.substr(-7) == '.dev.js') {
         var compressedFileName = jsPath + f.substr(0, f.length - 6) + 'js';

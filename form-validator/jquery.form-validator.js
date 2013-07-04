@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.13
+* @version 1.9.15
 */
 (function($) {
 
@@ -130,7 +130,7 @@
             validateWhenBlurred($element);
          }
 
-        var validation = $.formUtils.validateInput($element, language, config);
+        var validation = $.formUtils.validateInput($element, language, config, $form);
 
         if(validation === true) {
             $element.addClass('valid');
@@ -264,7 +264,8 @@
                     var valid = $.formUtils.validateInput(
                                     $element,
                                     language,
-                                    config
+                                    config,
+                                    $form
                                 );
 
                     if(valid !== true) {
@@ -298,7 +299,7 @@
         //
         // Remove possible error messages from last validation
         //
-        $('.' + config.errorMessageClass.split(' ').join('.')).remove();
+        $('.' + $.split(config.errorMessageClass, ' ').join('.')).remove();
         $('.jquery_form_error_message').remove();
 
 
@@ -354,6 +355,54 @@
         return this;
     };
 
+    /**
+     * Add suggestion dropdown to inputs having data-suggestions with a comma
+     * separated string with suggestions
+     * @param {Array} [settings]
+     * @returns {jQuery}
+     */
+    $.fn.addSuggestions = function(settings) {
+        this.find('input').each(function() {
+            var $input = $(this),
+                suggestions = $input.attr('data-suggestions');
+
+            if( suggestions && suggestions.length ) {
+                $.formUtils.suggest($input, $.split(suggestions), settings);
+            }
+        });
+        return this;
+    };
+
+    /**
+     * A bit smarter split function
+     * @param {String} val
+     * @param {Function|String} [func]
+     * @param {String} [delim]
+     * @returns {Array|void}
+     */
+    $.split = function(val, func, delim) {
+        if( typeof func != 'function' ) {
+            // return string
+            if( !val )
+                return [];
+            var values = [];
+            $.each(val.split(func ? func:','), function(i,str) {
+                str = $.trim(str);
+                if( str.length )
+                    values.push(str);
+            });
+            return values;
+        } else if( val ) {
+            // use callback on each
+            if( !delim )
+                delim = ',';
+            $.each(val.split(delim), function(i, str) {
+                str = $.trim(str);
+                if( str.length )
+                    return func(str, i);
+            });
+        }
+    };
 
     $.formUtils = {
 
@@ -453,21 +502,22 @@
         loadModules : function(modules, path) {
 
             var loadModuleScripts = function(modules, path) {
-                var moduleList = modules.split(',');
-                var numModules = moduleList.length;
-                var moduleLoadedCallback = function() {
-                    numModules--;
-                    if( numModules == 0 ) {
-                        $.formUtils.trigger('load', path);
-                    }
-                };
-                $.each(moduleList, function(i, module) {
-                    var moduleName = $.trim(module);
-                    if( moduleName.length == 0 ) {
+                var moduleList = $.split(modules),
+                    numModules = moduleList.length,
+                    moduleLoadedCallback = function() {
+                        numModules--;
+                        if( numModules == 0 ) {
+                            $.formUtils.trigger('load', path);
+                        }
+                    };
+
+                $.each(moduleList, function(i, modName) {
+                    modName = $.trim(modName);
+                    if( modName.length == 0 ) {
                         moduleLoadedCallback();
                     }
                     else {
-                        var scriptUrl = path + $.trim(module) + '.js';
+                        var scriptUrl = path + modName + (modName.substr(-3) == '.js' ? '':'.js');
                         $.ajax({
                             url : scriptUrl,
                             cache : scriptUrl.substr(-7) != '.dev.js',
@@ -478,7 +528,7 @@
                             },
                             error : function() {
                                 moduleLoadedCallback();
-                                throw new Error('Unable to load form validation module '+module);
+                                throw new Error('Unable to load form validation module '+modName);
                             }
                         });
                     }
@@ -491,13 +541,15 @@
                 $(function() {
                     $('script').each(function() {
                         var src = $(this).attr('src');
-                        var scriptName = src.substr(src.lastIndexOf('/')+1, src.length);
-                        if(scriptName == 'jquery.form-validator.js' || scriptName == 'jquery.form-validator.min.js') {
-                            path = src.substr(0, src.lastIndexOf('/')) + '/';
-                            if(path == '/')
-                                path = '';
+                        if( src ) {
+                            var scriptName = src.substr(src.lastIndexOf('/')+1, src.length);
+                            if(scriptName.indexOf('jquery.form-validator.js') > -1 || scriptName.indexOf('jquery.form-validator.min.js') > -1) {
+                                path = src.substr(0, src.lastIndexOf('/')) + '/';
+                                if(path == '/')
+                                    path = '';
 
-                            return false;
+                                return false;
+                            }
                         }
                     });
 
@@ -514,9 +566,10 @@
         * @param {jQuery} $element
         * @param {Object} language ($.formUtils.LANG)
         * @param {Object} config
+        * @param {jQuery} $form
         * @return {String|Boolean}
         */
-        validateInput : function($element, language, config) {
+        validateInput : function($element, language, config, $form) {
 
             // Multiple select
             if( $element.get(0).nodeName == 'SELECT' && $element.attr('multiple') ) {
@@ -560,37 +613,41 @@
             var validationRules = $element.attr(config.validationRuleAttribute);
 
             // see if form element has inline err msg attribute
-            var validationErrorMsg = $element.attr(config.validationErrorMsgAttribute);
+            var validationErrorMsg = true;
 
-            if ( validationRules ) {
-                var posRules = validationRules.split(' ');
-                for(var i=0; i < posRules.length; i++) {
-                    if( posRules[i].substr(0, 9) != 'validate_' ) {
-                        posRules[i] = 'validate_' + posRules[i];
-                    }
-
-                    var validator = $.formUtils.validators[posRules[i]];
-
-                    if( validator && typeof validator['validate'] == 'function' ) {
-
-                        var isValid = validator.validate(value, $element, config, language, $element.closest('form'));
-
-                        if(!isValid) {
-                            $.formUtils.trigger('invalid', $element);
-                            if( !validationErrorMsg ) {
-                                validationErrorMsg = language[validator.errorMessageKey];
-                                if(typeof validationErrorMsg == 'undefined')
-                                    validationErrorMsg = validator.errorMessage;
-                            }
-                            return validationErrorMsg;
-                        }
-                    } else {
-                        console.warn('Using undefined validator "'+posRules[i]+'"');
-                    }
+            $.split(validationRules, function(rule) {
+                if( rule.indexOf('validate_') !== 0 ) {
+                    rule = 'validate_' + rule;
                 }
+
+                var validator = $.formUtils.validators[rule];
+
+                if( validator && typeof validator['validate'] == 'function' ) {
+
+                    var isValid = validator.validate(value, $element, config, language, $form);
+
+                    if(!isValid) {
+                        $.formUtils.trigger('invalid', $element);
+                        validationErrorMsg =  $element.attr(config.validationErrorMsgAttribute);
+                        if( !validationErrorMsg ) {
+                            validationErrorMsg = language[validator.errorMessageKey];
+                            if( !validationErrorMsg )
+                                validationErrorMsg = validator.errorMessage;
+                        }
+                        return false; // breaks the iteration
+                    }
+                } else {
+                    console.warn('Using undefined validator "'+rule+'"');
+                }
+
+            }, ' ');
+
+            if( typeof validationErrorMsg == 'string' ) {
+                return validationErrorMsg;
+            } else {
+                $.formUtils.trigger('valid', $element);
+                return true;
             }
-            $.formUtils.trigger('valid', $element);
-            return true;
         },
 
         /**
@@ -1074,8 +1131,8 @@
     */
     $.formUtils.addValidator({
         name : 'validate_required',
-        validate : function(val) {
-            return val !== '';
+        validate : function(val, $el) {
+            return $el.attr('type') == 'checkbox' ? $el.is(':checked') : $.trim(val) !== '';
         },
         errorMessage : '',
         errorMessageKey: 'requiredFields'
@@ -1094,7 +1151,7 @@
                 return true;
             }
 
-            var range = len.split('-');
+            var range = $.split(len, '-');
 
             // range
             if(range.length == 2 && (value.length < parseInt(range[0],10) || value.length > parseInt(range[1],10))) {

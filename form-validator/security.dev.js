@@ -12,7 +12,7 @@
  *  - validate_backend
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.13
+ * @version 1.9.15
  */
 (function($) {
 
@@ -177,6 +177,7 @@
             }
 
             $el.bind('keyup', function() {
+                var val = $(this).val();
                 var $parent = typeof config.parent == 'undefined' ? $(this).parent() : $(config.parent);
                 var $displayContainer = $parent.find('.strength-meter');
                 if($displayContainer.length == 0) {
@@ -186,7 +187,13 @@
                         .appendTo($parent);
                 }
 
-                var strength = $.formUtils.validators.validate_strength.calculatePasswordStrength($(this).val());
+                if( !val ) {
+                    $displayContainer.hide();
+                } else {
+                    $displayContainer.show();
+                }
+
+                var strength = $.formUtils.validators.validate_strength.calculatePasswordStrength(val);
                 var css = {
                     background: 'pink',
                     color : '#FF0000',
@@ -261,17 +268,17 @@
                 url : backendUrl,
                 type : 'POST',
                 cache : false,
-                data : 'validate='+val,
+                data : $el.attr('name')+'='+val,
                 dataType : 'json',
-                success : function(json) {
+                success : function(response) {
 
-                    if(json.success) {
+                    if(response.valid) {
                         $el.valAttr('backend-valid', 'true');
                     }
                     else {
                         $el.valAttr('backend-invalid', 'true');
-                        if(json.message)
-                            $el.attr(conf.validationErrorMsgAttribute, json.message);
+                        if(response.message)
+                            $el.attr(conf.validationErrorMsgAttribute, response.message);
                         else
                             $el.removeAttr(conf.validationErrorMsgAttribute);
                     }
