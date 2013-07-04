@@ -58,7 +58,7 @@ So what has changed since version 1.x?
  * **custom** — *Validate value against regexp
  * **num_answers** — *Validate that a select element has the required number of selected options (num_answers num5)*
  * Show help information automatically when input is focused
- * Validate given values immediately when input is blurred.
+ * Validate given values immediately when input looses focus.
  * Make validation dependent on another input of type checkbox being checked by adding attribute data-validation-if-checked="name of checkbox input"
  * Make validation optional by adding attribute data-validation-optional="true" to the element. This means
  that the validation defined in data-validation only will take place in case a value is given.
@@ -189,7 +189,7 @@ It is possible to show that the value of an input is incorrect immediately when 
 ```
 
 ## Show help information
-It is possible to display help information for each input. The information will fade in when input is focused and fade out when input is blurred.
+It is possible to display help information for each input. The information will fade in when input is focused and fade out when input looses focus.
 
 ```html
 <form action="" onsubmit="return $(this).validate();" id="my_form">
