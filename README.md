@@ -18,15 +18,15 @@ particular form.
 <form action="" onsubmit="return $(this).validate();">
   <p>
     Name (4 characters minimum):
-    <input name="user" data-validation="validate_min_length length4" />
+    <input name="user" data-validation="min_length length4" />
   </p>
   <p>
     Birthdate (yyyy-mm-dd):
-    <input name="birth" data-validation="validate_birthdate" />
+    <input name="birth" data-validation="birthdate" />
   </p>
   <p>
     Website:
-    <input name="website" data-validation="validate_url" />
+    <input name="website" data-validation="url" />
   </p>
   <p>
     <input type="submit" />
@@ -34,6 +34,15 @@ particular form.
 </form>
 ...
 ```
+
+### Moving up to version 2.0
+
+So what has changed since version 1.x?
+
+ * A whole bunch of validation functions have been added (see below)
+ * A modular design have been introduced, which means that some validation functions is default and others is part of a module
+ * You no longer need to prefix the validation rules with "validate_"
+
 
 ### Default validators (no module needed)
  * **validate_url**
