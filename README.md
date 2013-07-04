@@ -4,6 +4,8 @@ it's designed to require as little bandwidth as possible. This is achieved by gr
 in "modules", making it possible for the programmer to load **only those functions that's needed** to validate a
 particular form.
 
+*Form demonstrations and full documentations is available at http://formvalidator.net/*
+
 *Usage example*
 
 ```html
@@ -18,7 +20,7 @@ particular form.
 <form action="" onsubmit="return $(this).validate();">
   <p>
     Name (4 characters minimum):
-    <input name="user" data-validation="min_length length4" />
+    <input name="user" data-validation="length" data-validation-length="min4" />
   </p>
   <p>
     Birthdate (yyyy-mm-dd):
@@ -40,56 +42,21 @@ particular form.
 So what has changed since version 1.x?
 
  * A whole bunch of validation functions have been added (see below)
- * A modular design have been introduced, which means that some validation functions is default and others is part of a module
+ * A modular design have been introduced, which means that some validation functions is default and others is
+ part of a module.
  * You no longer need to prefix the validation rules with "validate_"
 
 
-### Default validators (no module needed)
- * **validate_url**
- * **validate_email**
- * **validate_domain** — *domain.com*
- * **validate_phone** — *atleast 7 digits only one hyphen and plus allowed*
- * **validate_float**
- * **validate_int**
- * **validate_date** — *yyyy-mm-dd (format can be customized, more information below)*
- * **validate_length** — *Validate that input length is in given range (length3-20)*
- * **validate_confirmation**
- * **validate_spamcheck**
- * **validate_ukvatnumber**
- * **validate_swesec** — *validate swedish social security number*
+### Default validators and features (no module needed)
+ * **url**
+ * **email**
+ * **domain** — *domain.com*
+ * **number** — *float/negative/positive*
+ * **date** — *yyyy-mm-dd (format can be customized, more information below)*
+ * **length** — *min/max/range*
  * **required** — *no validation except that a value has to be given*
- * **validate_custom** — *Validate value against regexp (validate_custom regexp/^[a-z]{2} [0-9]{2}$/)
- * **validate_num_answers** — *Validate that a select element has the required number of selected options (validate_num_answers num5)*
-
-### Module: security
- * **validate_spamcheck**
- * **validate_confirmation**
- * **validate_strength** — *Validate the strength of a password (validate_strength strength3)*
- * **validate_backend** — *Validate value of input on backend*
-
-### Module: date
- * **validate_time** — *hh:mm*
- * **validate_birthdate** — *yyyy-mm-dd, not allowing dates in the future or dates that's older than 122 years (format can be customized, more information below)*
-
-### Module: location
- * **validate_country**
- * **validate_federatestate**
- * **validate_longlat**
- * Suggest countries (english only)
- * Suggest states in the US
-
-### Module: sweden
- * **validate_swemob** — *validate that the value is a swedish mobile telephone number*
- * **validate_swesec** — *validate swedish social security number*
- * **validate_county** - *validate that the value is an existing county in Sweden*
- * **validate_municipality** - *validate that the value is an existing municipality in Sweden*
- * Suggest county
- * Suggest municipality
-
-### Module: ukvat
- * **validate_ukvatnumber**
-
-### Misc (part of core)
+ * **custom** — *Validate value against regexp
+ * **num_answers** — *Validate that a select element has the required number of selected options (num_answers num5)*
  * Show help information automatically when input is focused
  * Validate given values immediately when input is blurred.
  * Make validation dependent on another input of type checkbox being checked by adding attribute data-validation-if-checked="name of checkbox input"
@@ -98,6 +65,34 @@ So what has changed since version 1.x?
  * Make validation dependent on another input of type checkbox being checked by adding attribute
  data-validation-if-checked="name of checkbox input"
  * Create input suggestions with ease, no jquery-ui needed
+
+### Module: security
+ * **spamcheck**
+ * **confirmation**
+ * **strength** — *Validate the strength of a password (strength strength3)*
+ * **backend** — *Validate value of input on backend*
+
+### Module: date
+ * **time** — *hh:mm*
+ * **birthdate** — *yyyy-mm-dd, not allowing dates in the future or dates that's older than 122 years (format can be customized, more information below)*
+
+### Module: location
+ * **country**
+ * **federatestate**
+ * **longlat**
+ * Suggest countries (english only)
+ * Suggest states in the US
+
+### Module: sweden
+ * **swemob** — *validate that the value is a swedish mobile telephone number*
+ * **swesec** — *validate swedish social security number*
+ * **county** - *validate that the value is an existing county in Sweden*
+ * **municipality** - *validate that the value is an existing municipality in Sweden*
+ * Suggest county
+ * Suggest municipality
+
+### Module: ukvat
+ * **ukvatnumber**
 
 
 ## Writing a custom validator
@@ -111,11 +106,11 @@ that checks if the input contains an even number.
   <script src="js/formvalidator/jquery.formvalidator.min.js"></script>
   <script>
     $.formUtils.addValidator({
-        name : 'validate_even',
+        name : 'even',
         validate : function(value, $el, config, language, $form) {
             return parseInt(value, 10) % 2 === 0;
         },
-        errorMessage : 'You have to give a even number',
+        errorMessage : 'You have to answer an even number',
         errorMessageKey: 'badEvenNumber'
     });
   </script>
@@ -124,7 +119,7 @@ that checks if the input contains an even number.
  ...
  <form action="" method="post" onsubmit="return $(this).validate();">
  <p>
-   <input type="text" data-validation="validate_even" />
+   <input type="text" data-validation="even" />
  ...
 ```
 
@@ -184,7 +179,7 @@ It is possible to show that the value of an input is incorrect immediately when 
 <form action="" onsubmit="return $(this).validate();" id="my_form">
   <p>
 	  <strong>Website:</strong>
-	  <input type="text" name="website" data-validation="validate_url" />
+	  <input type="text" name="website" data-validation="url" />
 	</p>
 	...
 </form>
@@ -326,7 +321,7 @@ $_SESSION['captcha'] = array( mt_rand(0,9), mt_rand(1, 9) );
 <form action="" onsubmit="return $(this).validate();">
   <p>
     What is the sum of <?=$_SESSION['captcha'][0]?> + <?=$_SESSION['captcha'][1]?>? (security question)
-    <input name="captcha" data-validation="validate_spamcheck captcha<?=( $_SESSION['capthca'][0] + $_SESSION['captcha'][1] )?>"
+    <input name="captcha" data-validation="spamcheck captcha<?=( $_SESSION['capthca'][0] + $_SESSION['captcha'][1] )?>"
   </p>
   <p><input type="submit" /></p>
 </form>
@@ -347,19 +342,19 @@ $_SESSION['captcha'] = array( mt_rand(0,9), mt_rand(1, 9) );
 
 ## Password confirmation example
 ```html
-  <p>Password: <input type="password" name="pass" data-validation="validate_confirmation" /></p>
+  <p>Password: <input type="password" name="pass" data-validation="confirmation" /></p>
   <p>Confirm password: <input type="password" name="pass_confirmation" /></p>
 ```
 
 ## Changelog
 
 #### 2.0
- * validate_[min|max]_length is removed (now merged with validate_length)
- * validate_number, validate_int, validate_float is merged together, all three variants is now validated by validate_number
- * validate_phone moved to "sweden" module and renamed to validate_swephone
- * The attribute to be used when defining the regular expression for validate_custom is now moved to its own attribute (data-validation-regexp)
- * validate_length now looks at attribute data-validation-length to find out how long or short the value must be
- * The validation rule no longer needs to be prefixed with "validate_"
+ * [min|max]_length is removed (now merged with length)
+ * number, int, float is merged together, all three variants is now validated by number
+ * phone moved to "sweden" module and renamed to swephone
+ * The attribute to be used when defining the regular expression for custom is now moved to its own attribute (data-validation-regexp)
+ * length now looks at attribute data-validation-length to find out how long or short the value must be
+ * The validation rule no longer needs to be prefixed with ""
  * Some validation functions is moved to modules (see function reference in top of this document)
 
 ## Maintainer
