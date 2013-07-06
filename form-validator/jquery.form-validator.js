@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.19
+* @version 1.9.20
 */
 (function($) {
 
@@ -470,6 +470,7 @@
          * @param {Function} callback
          */
         on : function(evt, callback) {
+            // Why not use $(document).bind('validators.loaded', func);
             this._events[evt].push(callback);
         },
 
@@ -852,8 +853,10 @@
 
                     // Find the right suggestions
                     if(val != '') {
+                        var findPartials = val.length > 2 ? true:false;
                         $.each(suggestions, function(i, v) {
-                            if(v.toLocaleLowerCase().indexOf(val) === 0) {
+                            v = v.toLocaleLowerCase();
+                            if(v.indexOf(val) === 0 || (findPartials && v.indexOf(val) > -1)) {
                                 foundSuggestions.push(v);
                             }
                         });
@@ -1210,12 +1213,13 @@
         name : 'validate_number',
         validate : function(val, $el) {
             if(val !== '') {
-                var allowing = $el.valAttr('allowing');
-                if(allowing === undefined)
-                    allowing = 'number';
+                var allowing = $el.valAttr('allowing') || '';
+                if(allowing.indexOf('number') == -1)
+                    allowing += ',number';
 
-                if(allowing.indexOf('negative') > -1 && val.indexOf('-') === 0)
+                if(allowing.indexOf('negative') > -1 && val.indexOf('-') === 0) {
                     val = val.substr(1);
+                }
 
                 if(allowing.indexOf('number') > -1 && val.replace(/[0-9]/g, '') === '') {
                     return true;

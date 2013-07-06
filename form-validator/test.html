@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>QUnit Tests</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<form id="dummy-form" style="visibility: hidden"></form>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="jquery.form-validator.js"></script>
+<script src="//code.jquery.com/qunit/qunit-1.12.0.js"></script>
+<script>
+(function($) {
+
+    var $form = $('#dummy-form'), $in=null;
+    window.$form = $form;
+    window.$in = $in;
+
+    function input(val, dataValidationAttr, elAttr) {
+        if(!elAttr)
+            elAttr = {};
+        if( typeof dataValidationAttr == 'string') {
+            elAttr['data-validation'] = dataValidationAttr;
+        } else {
+            $.each(dataValidationAttr, function(x, val) {
+                if( x == '' ) {
+                    elAttr['data-validation'] = val;
+                } else {
+                    elAttr['data-validation-'+x] = val;
+                }
+            });
+        }
+
+        elAttr['value'] = val;
+        $in = $('<input />', elAttr);
+        $in.appendTo($form);
+        return $in;
+    }
+
+    function clearForm() {
+        $form.children().remove();
+    }
+
+    function runTest(obj, validation) {
+        var $el = typeof obj.val == 'string' ? input(obj.val, validation) : obj.val;
+        var result = $.formUtils.validateInput($el, $.formUtils.LANG, $.formUtils.defaultConfig(), $form);
+
+        var message;
+        if( typeof obj.val == 'string' ) {
+            message  = 'Could not validate that '+obj.val+' is '+(obj.isValid ? 'valid':'invalid');
+        } else {
+            message = 'Could not validate that input[value='+obj.val.attr('value')+'] is '+(obj.isValid ? 'valid':'invalid');
+        }
+
+        equal(
+            typeof(result),
+            obj.isValid ? 'boolean':'string',
+            message
+        );
+    }
+
+    function runAllTests() {
+
+        /*
+         * E-MAIL VALIDATION
+         */
+        test("E-mail validation", function() {
+
+            clearForm();
+
+            var values = [
+                {val: 'sasas@sdssds.se', isValid : true},
+                {val: '', isValid : false},
+                {val: 'asdsd@sdsds.se', isValid : true},
+                {val: 'asdsdsd@sdsd.co.uk', isValid : true},
+                {val: 'sasas@sdsd.xxx', isValid : true},
+                {val: 'sasas@sdsd.xxz', isValid : false},
+                {val: '@sdsd.xxz', isValid : false},
+                {val: 'sasas@', isValid : false},
+                {val: 'sasas.se', isValid : false},
+                {val: 'sasas-sdsd.com', isValid : false}
+            ];
+
+            $.each(values, function(i, obj) {
+                runTest(obj, 'email');
+            });
+        });
+
+        /*
+         * URL VALIDATION
+         */
+        test("URL validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val: 'klsdmfklsmdf', isValid: false},
+                {val: 'http://google.se', isValid: true},
+                {val: 'https://google.se/test/?arge=hej_&arg[]=123', isValid: true},
+                {val: 'http://google.xxx/test/test.jsp', isValid: true},
+                {val: 'http://google.xxy', isValid: false},
+                {val: 'http://google.xxy/test/test.jsp', isValid: false},
+                {val: 'http://google.test.de', isValid: true},
+                {val: 'http://google.test.co.uk/', isValid: true}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'url');
+            });
+        });
+
+
+        /*
+         * DOMAIN VALIDATION
+         */
+        test("Domain validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val:'domain.xxx', isValid:true},
+                {val:'domain.com', isValid:true},
+                {val:'www.domain.com', isValid:true},
+                {val:'http://domain.se', isValid:true},
+                {val:'http://www.domain.se', isValid:true},
+                {val:'http://www.domain.se/', isValid:true},
+                {val:'domain.com/', isValid:true},
+                {val:'', isValid:false}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'domain');
+            });
+        });
+
+        /*
+         * REQUIRED VALIDATION
+         */
+        test("Require validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val:'a', isValid:true},
+                {val:'asdf askldfmlksamdf', isValid:true},
+                {val:'  ', isValid:false},
+                {val:"\n", isValid:false},
+                {val:'', isValid:false}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'required');
+            });
+        });
+
+        /*
+         * NUMBER VALIDATION
+         */
+        test("Number validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val:'123', isValid:true},
+                {val:'', isValid:false},
+                {val:'asdfsd', isValid:false},
+                {val:'-123', isValid:false},
+                {val:input('-123', {'allowing':'negative', '':'number'}), isValid:true},
+                {val:'1.032', isValid:false},
+                {val:input('1.023', {'allowing':'float', '':'number'}), isValid:true},
+                {val:'-1.032', isValid:false},
+                {val:input('-1.023', {'allowing':'float,negative', '':'number'}), isValid:true},
+                {val:input('1.023', {'allowing':'float,negative', '':'number'}), isValid:true},
+                {val:input('1.023', {'allowing':'float,negative,number', '':'number'}), isValid:true},
+                {val:'123', isValid:true}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'number');
+            });
+        });
+
+        /*
+         * LENGTH VALIDATION
+         */
+        test("Length validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val:input('1234', {'length':'max3', '':'length'}, {name:6}), isValid:false},
+                {val:input('1234', {'length':'min3', '':'length'}, {name:5}), isValid:true},
+                {val:input('1234', {'length':'min5', '':'length'}, {name:4}), isValid:false},
+                {val:input('1234', {'length':'2-35', '':'length'}, {name:3}), isValid:true},
+                {val:input('123456', {'length':'2-5', '':'length'}, {name:3}), isValid:false},
+                {val:input('1234', {'length':'max4', '':'length'}, {name:1}), isValid:true},
+                {val:input('1234', {length : 'min5', '':'number length'}), isValid:false},
+                {val:input('12345', {length : 'min5', '':'number length'}), isValid:true},
+                {val:input('1234a', {length : 'min5', '':'number length'}), isValid:false},
+                {val:input('12345678', {length : 'min5', '':'number length'}), isValid:true}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'domain');
+            });
+        });
+
+        // TODO: Write more tests...
+
+    }
+
+    var dev = window.location.hash.indexOf('dev') ? '.dev' : '';
+    $.formUtils.on('load', runAllTests);
+    $.formUtils.loadModules('date'+dev+', location'+dev+', security'+dev+', sweden'+dev+', uk'+dev+'');
+
+})(jQuery);
+</script>
+<form action="" id="test-form" onsubmit="alert( jQuery(this).validate() ? 'Valid':'Invalid' ); return false; ">
+    <p>
+        <strong>Inline suggestions</strong><br />
+        <input id="inline-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
+    </p>
+</form>
+<script>
+    jQuery(function($) {
+        $('#test-form').addSuggestions();
+    })
+</script>
+<body>
+</html>

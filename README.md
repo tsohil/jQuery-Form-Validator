@@ -55,7 +55,7 @@ So what has changed since version 1.x?
  * **date** — *yyyy-mm-dd (format can be customized, more information below)*
  * **length** — *min/max/range*
  * **required** — *no validation except that a value has to be given*
- * **custom** — *Validate value against regexp
+ * **custom** — *Validate value against regexp*
  * **num_answers** — *Validate that a select element has the required number of selected options (num_answers num5)*
  * Show help information automatically when input is focused
  * Validate given values immediately when input looses focus.
