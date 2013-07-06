@@ -28,7 +28,8 @@ console.log('Build version: '+newVersion);
  * Get code docs
  */
 var documentation = fs.readFileSync(mainScript, 'utf-8').split('*/')[0]+'*/';
-console.log(documentation);
+var docParts = documentation.split('@version ');
+documentation = docParts[0] +'@version '+newVersion+'\n'+docParts[1].split('\n')[1];
 
 
 /**
