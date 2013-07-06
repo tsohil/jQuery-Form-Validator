@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.26
+* @version 1.9.27
 */
 (function($) {
 
@@ -536,26 +536,34 @@
                 });
             };
 
-            if(typeof path != 'undefined')
+            if( path ) {
                 loadModuleScripts(modules, path);
-            else {
-                $(function() {
+            } else {
+                var findScriptPathAndLoadModules = function() {
+                    var foundPath = false;
                     $('script').each(function() {
                         var src = $(this).attr('src');
                         if( src ) {
                             var scriptName = src.substr(src.lastIndexOf('/')+1, src.length);
                             if(scriptName.indexOf('jquery.form-validator.js') > -1 || scriptName.indexOf('jquery.form-validator.min.js') > -1) {
-                                path = src.substr(0, src.lastIndexOf('/')) + '/';
-                                if(path == '/')
-                                    path = '';
-
+                                foundPath = src.substr(0, src.lastIndexOf('/')) + '/';
+                                if( foundPath == '/' )
+                                    foundPath = '';
                                 return false;
                             }
                         }
                     });
 
-                    loadModuleScripts(modules, path);
-                });
+                    if( foundPath !== false) {
+                        loadModuleScripts(modules, foundPath);
+                        return true;
+                    }
+                    return false;
+                };
+
+                if( !findScriptPathAndLoadModules() ) {
+                    $(findScriptPathAndLoadModules);
+                }
             }
         },
 
