@@ -9,6 +9,20 @@
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
 <form id="dummy-form" style="visibility: hidden"></form>
+<form action="" id="test-form" onsubmit="alert( jQuery(this).validate() ? 'Valid':'Invalid' ); return false; ">
+    <p>
+        <strong>Inline suggestions</strong><br />
+        <input id="inline-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
+    </p>
+    <p>
+        <strong>Country suggestions</strong><br />
+        <input id="country-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
+    </p>
+    <p>
+        <strong>Swedish county suggestions</strong><br />
+        <input id="swedish-county-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
+    </p>
+</form>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src="jquery.form-validator.js"></script>
 <script src="//code.jquery.com/qunit/qunit-1.12.0.js"></script>
@@ -50,15 +64,15 @@
 
         var message;
         if( typeof obj.val == 'string' ) {
-            message  = 'Could not validate that '+obj.val+' is '+(obj.isValid ? 'valid':'invalid');
+            message  = 'Check that '+obj.val+' is '+(obj.isValid ? 'valid':'invalid');
         } else {
-            message = 'Could not validate that input[value='+obj.val.attr('value')+'] is '+(obj.isValid ? 'valid':'invalid');
+            message = 'Check that input[value='+obj.val.attr('value')+'] is '+(obj.isValid ? 'valid':'invalid');
         }
 
         equal(
-            typeof(result),
-            obj.isValid ? 'boolean':'string', // returns true if valid, error message otherwise
-            message
+                typeof(result),
+                obj.isValid ? 'boolean':'string', // returns true if valid, error message otherwise
+                message
         );
     }
 
@@ -212,22 +226,17 @@
 
     }
 
-    var dev = window.location.hash.indexOf('dev') ? '.dev' : '';
-    $.formUtils.on('load', runAllTests);
+    var dev = window.location.hash.indexOf('dev') > -1 ? '.dev' : '';
+    $.formUtils.on('load', function() {
+        runAllTests();
+        $('#test-form').addSuggestions();
+        $('#country-suggestions').suggestCountry();
+        $('#swedish-county-suggestions').suggestSwedishCounty();
+    });
+
     $.formUtils.loadModules('date'+dev+', location'+dev+', security'+dev+', sweden'+dev+', uk'+dev+'');
 
 })(jQuery);
-</script>
-<form action="" id="test-form" onsubmit="alert( jQuery(this).validate() ? 'Valid':'Invalid' ); return false; ">
-    <p>
-        <strong>Inline suggestions</strong><br />
-        <input id="inline-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
-    </p>
-</form>
-<script>
-    jQuery(function($) {
-        $('#test-form').addSuggestions();
-    })
 </script>
 <body>
 </html>

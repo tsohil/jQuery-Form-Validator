@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.27
+* @version 1.9.29
 */
 (function($) {
 
@@ -362,12 +362,14 @@
      * @returns {jQuery}
      */
     $.fn.addSuggestions = function(settings) {
+        var sugs = false;
         this.find('input').each(function() {
-            var $input = $(this),
-                suggestions = $input.attr('data-suggestions');
+            var $field = $(this);
 
-            if( suggestions && suggestions.length ) {
-                $.formUtils.suggest($input, $.split(suggestions), settings);
+            sugs = $.split($field.attr('data-suggestions'));
+
+            if( sugs.length > 0 ) {
+                new $.formUtils.suggest($field, sugs, settings);
             }
         });
         return this;
@@ -542,11 +544,10 @@
                 var findScriptPathAndLoadModules = function() {
                     var foundPath = false;
                     $('script').each(function() {
-                        var src = $(this).attr('src');
-                        if( src ) {
-                            var scriptName = src.substr(src.lastIndexOf('/')+1, src.length);
+                        if( this.src ) {
+                            var scriptName = this.src.substr(this.src.lastIndexOf('/')+1, this.src.length);
                             if(scriptName.indexOf('jquery.form-validator.js') > -1 || scriptName.indexOf('jquery.form-validator.min.js') > -1) {
-                                foundPath = src.substr(0, src.lastIndexOf('/')) + '/';
+                                foundPath = this.src.substr(0, this.src.lastIndexOf('/')) + '/';
                                 if( foundPath == '/' )
                                     foundPath = '';
                                 return false;
@@ -817,7 +818,7 @@
                     cursor: 'pointer'
                 },
                 activeSuggestionCSS : {
-                    background : '#F2F2F2'
+                    background : '#E9E9E9'
                 }
             };
 
@@ -838,6 +839,7 @@
             };
 
             $element
+                .data('suggestions', suggestions)
                 .valAttr('suggestion-nr', this._numSuggestionElements)
                 .bind('focus', function() {
                     $(this).trigger('keyup');
@@ -861,16 +863,17 @@
 
                     // Find the right suggestions
                     if(val != '') {
-                        var findPartials = val.length > 2 ? true:false;
-                        $.each(suggestions, function(i, v) {
-                            v = v.toLocaleLowerCase();
-                            if(v.indexOf(val) === 0 || (findPartials && v.indexOf(val) > -1)) {
-                                foundSuggestions.push(v);
+                        var findPartial = val.length > 2;
+                        $.each($input.data('suggestions'), function(i, suggestion) {
+                            var lowerCaseVal = suggestion.toLocaleLowerCase();
+                            if( lowerCaseVal == val ) {
+                                foundSuggestions.push('<strong>'+suggestion+'</strong>');
+                                hasTypedSuggestion = true;
+                                return false;
+                            } else if(lowerCaseVal.indexOf(val) === 0 || (findPartial && lowerCaseVal.indexOf(val) > -1)) {
+                                foundSuggestions.push(suggestion.replace(new RegExp(val, 'gi'), '<strong>$&</strong>'));
                             }
                         });
-
-                        if(foundSuggestions.length == 1 && foundSuggestions[0].length == val.length)
-                            hasTypedSuggestion = true;
                     }
 
                     // Hide suggestion container
@@ -903,9 +906,14 @@
 
                         // Add suggestions HTML to container
                         $suggestionContainer.html('');
-                        $.each(foundSuggestions, function(i, s) {
+                        $.each(foundSuggestions, function(i, text) {
                             $('<div></div>')
-                                .text(s)
+                                .append(text)
+                                .css({
+                                    overflow: 'hidden',
+                                    textOverflow : 'ellipsis',
+                                    whiteSpace : 'nowrap'
+                                })
                                 .addClass('form-suggest-element')
                                 .appendTo($suggestionContainer)
                                 .click(function() {
