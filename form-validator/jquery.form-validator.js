@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.30
+* @version 1.9.32
 */
 (function($) {
 
@@ -1301,8 +1301,8 @@
         name : 'validate_date',
         validate : function(date, $el, conf) {
             var dateFormat = 'yyyy-mm-dd';
-            if($el.attr('data-format')) {
-                dateFormat = $el.attr('data-format');
+            if($el.attr('data-validation-format')) {
+                dateFormat = $el.attr('data-validation-format');
             }
             else if(typeof conf.dateFormat != 'undefined') {
                 dateFormat = conf.dateFormat;

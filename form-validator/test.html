@@ -232,17 +232,46 @@
         /*
          * LENGTH VALIDATION
          */
+        test("Date validation", function() {
+
+            clearForm();
+
+            var dates = [
+                {val:'2000-01-01', isValid:true},
+                {val:'2000-01-1', isValid:false},
+                {val:'2000-01-32', isValid:false},
+                {val:'2000-02-29', isValid:true}, // leap year
+                {val:'2013-02-29', isValid:false},
+                {val:'2000-04-31', isValid:false},
+                {val:'2000-13-1', isValid:false},
+                {val:'2000-1-1', isValid:false},
+                {val:'-01-01', isValid:false},
+                {val:input('01/01/2000', {'format':'dd/mm/yyyy', '':'date'}), isValid:true},
+                {val:input('29/02/2000', {'format':'dd/mm/yyyy', '':'date'}), isValid:true},
+                {val:input('29/02/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
+                {val:input('29/13/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
+                {val:input('29/00/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false}
+            ];
+
+            $.each(dates, function(i, obj) {
+                runTest(obj, 'date');
+            });
+        });
+
+        /*
+         * DATE VALIDATION
+         */
         test("Length validation", function() {
 
             clearForm();
 
             var links = [
-                {val:input('1234', {'length':'max3', '':'length'}, {name:6}), isValid:false},
-                {val:input('1234', {'length':'min3', '':'length'}, {name:5}), isValid:true},
-                {val:input('1234', {'length':'min5', '':'length'}, {name:4}), isValid:false},
-                {val:input('1234', {'length':'2-35', '':'length'}, {name:3}), isValid:true},
-                {val:input('123456', {'length':'2-5', '':'length'}, {name:3}), isValid:false},
-                {val:input('1234', {'length':'max4', '':'length'}, {name:1}), isValid:true},
+                {val:input('1234', {'length':'max3', '':'length'}), isValid:false},
+                {val:input('1234', {'length':'min3', '':'length'}), isValid:true},
+                {val:input('1234', {'length':'min5', '':'length'}), isValid:false},
+                {val:input('1234', {'length':'2-35', '':'length'}), isValid:true},
+                {val:input('123456', {'length':'2-5', '':'length'}), isValid:false},
+                {val:input('1234', {'length':'max4', '':'length'}), isValid:true},
                 {val:input('1234', {length : 'min5', '':'number length'}), isValid:false},
                 {val:input('12345', {length : 'min5', '':'number length'}), isValid:true},
                 {val:input('1234a', {length : 'min5', '':'number length'}), isValid:false},
@@ -250,7 +279,7 @@
             ];
 
             $.each(links, function(i, obj) {
-                runTest(obj, 'domain');
+                runTest(obj, 'length');
             });
         });
 
