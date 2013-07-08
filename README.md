@@ -53,6 +53,7 @@ So what has changed since version 1.x?
  * **domain** — *domain.com*
  * **number** — *float/negative/positive*
  * **date** — *yyyy-mm-dd (format can be customized, more information below)*
+ * **alphanumeric** — *with support for defining additional characters*
  * **length** — *min/max/range*
  * **required** — *no validation except that a value has to be given*
  * **custom** — *Validate value against regexp*

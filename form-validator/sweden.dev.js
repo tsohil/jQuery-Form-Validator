@@ -13,7 +13,7 @@
  *  - validate_swephone
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.29
+ * @version 1.9.30
  */
 (function($) {
 

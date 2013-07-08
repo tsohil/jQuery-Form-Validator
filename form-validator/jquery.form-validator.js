@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.29
+* @version 1.9.30
 */
 (function($) {
 
@@ -1011,15 +1011,16 @@
             badLength : 'You have to give an answer between ',
             notConfirmed : 'Values could not be confirmed',
             badDomain : 'Incorrect domain value',
-            badUrl : 'Incorrect url value',
-            badFloat : 'Incorrect float value',
+            badUrl : 'The answer you gave was not a correct URL',
             badCustomVal : 'You gave an incorrect answer',
-            badInt : 'Incorrect integer value',
+            badInt : 'The answer you gave was not a correct number',
             badSecurityNumber : 'Your social security number was incorrect',
             badUKVatAnswer : 'Incorrect UK VAT Number',
             badStrength : 'The password isn\'t strong enough',
             badNumberOfSelectedOptionsStart : 'You have to choose at least ',
-            badNumberOfSelectedOptionsEnd : ' answers'
+            badNumberOfSelectedOptionsEnd : ' answers',
+            badAlphaNumeric : 'The answer you gave must contain only alphanumeric characters ',
+            badAlphaNumericExtra: ' and '
         }
     };
 
@@ -1248,6 +1249,36 @@
         },
         errorMessage : '',
         errorMessageKey: 'badInt'
+    });
+
+    /*
+     * Validate alpha numeric
+     */
+    $.formUtils.addValidator({
+        name : 'validate_alphanumeric',
+        validate : function(val, $el, config, language) {
+            var patternStart = '^([a-zA-Z0-9',
+                patternEnd = ']+)$',
+                additionalChars = $el.attr('data-validation-allowing'),
+                pattern = '';
+
+            if( additionalChars ) {
+                pattern = patternStart + additionalChars + patternEnd;
+                var extra = additionalChars.replace(/\\/g, '');
+                if( extra.indexOf(' ') > -1 ) {
+                    extra = extra.replace(' ', '');
+                    extra += ' and spaces ';
+                }
+                this.errorMessage = language.badAlphaNumeric + language.badAlphaNumericExtra + extra;
+            } else {
+                pattern = patternStart + patternEnd;
+                this.errorMessage = language.badAlphaNumeric;
+            }
+
+            return new RegExp(pattern).test(val);
+        },
+        errorMessage : '',
+        errorMessageKey: ''
     });
 
     /*

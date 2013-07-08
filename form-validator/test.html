@@ -22,6 +22,17 @@
         <strong>Swedish county suggestions</strong><br />
         <input id="swedish-county-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
     </p>
+    <p>
+        <strong>Display password strength</strong><br />
+        <input type="password" id="password">
+    </p>
+    <p>
+        <strong>Alphanumeric and -_</strong><br>
+        <input name="test" data-validation="alphanumeric" data-validation-allowing="-_ ">
+    </p>
+    <p>
+        <input type="submit">
+    </p>
 </form>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src="jquery.form-validator.js"></script>
@@ -171,6 +182,27 @@
         });
 
         /*
+         * ALPHANUMERIC VALIDATION
+         */
+        test("Alphanumeric validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val:'a', isValid:true},
+                {val:'asdvs1', isValid:true},
+                {val:'a  b', isValid:false},
+                {val:'a-_ bäöåA', isValid:false},
+                {val:input('a b', {'allowing':' ', '':'alphanumeric'}), isValid:true},
+                {val:input('a-_ bäöåÖA', {'allowing':' -_öäåÄÖÅ', '':'alphanumeric'}), isValid:true}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'alphanumeric');
+            });
+        });
+
+        /*
          * NUMBER VALIDATION
          */
         test("Number validation", function() {
@@ -232,6 +264,7 @@
         $('#test-form').addSuggestions();
         $('#country-suggestions').suggestCountry();
         $('#swedish-county-suggestions').suggestSwedishCounty();
+        $('#password').displayPasswordStrength();
     });
 
     $.formUtils.loadModules('date'+dev+', location'+dev+', security'+dev+', sweden'+dev+', uk'+dev+'');
