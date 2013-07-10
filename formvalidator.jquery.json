@@ -18,7 +18,7 @@
     "download" : "https://raw.github.com/victorjonsson/jQuery-Form-Validator/master/jquery.formvalidator.min.js",
     "bugs" : "https://github.com/victorjonsson/jQuery-Form-Validator/issues",
     "licenses" : [{
-        "type": "GPLv2",
+        "type": "Dual licensed under the MIT or GPL Version 2 licenses",
         "url": "http://www.gnu.org/licenses/gpl-2.0.html"
     }],
     "dependencies" : {

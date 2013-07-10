@@ -9,15 +9,7 @@ particular form.
 *Usage example*
 
 ```html
-<html>
-<head>
-  <script src="js/jquery.min.js"></script>
-  <script src="js/form-validator/jquery.form-validator.min.js"></script>
-  <script>
-  	$.formUtils.loadModules('date,security');
-  </script>
-</head>
-<form action="" onsubmit="return $(this).validate();">
+<form action="" method="POST">
   <p>
     Name (4 characters minimum):
     <input name="user" data-validation="length" data-validation-length="min4" />
@@ -34,7 +26,13 @@ particular form.
     <input type="submit" />
   </p>
 </form>
-...
+<script src="js/jquery.min.js"></script>
+<script src="js/form-validator/jquery.form-validator.min.js"></script>
+<script>
+    $.setupForm({
+        modules : 'date, security'
+    });
+</script>
 ```
 
 ### Moving up to version 2.0
@@ -43,9 +41,11 @@ So what has changed since version 1.x?
 
  * A whole bunch of validation functions have been added (see below)
  * A modular design have been introduced, which means that some validation functions is default and others is
- part of a module.
+ part of a module. This in turn reduces server and bandwidth costs.
  * You no longer need to prefix the validation rules with "validate_"
  * Error message position now defaults to "element"
+ * The optional features (validatOnBlur and showHelpOnFocus) is now enabled by default
+ * The function $.setForm is introduced that makes it possible to initiate the form validation with less code
 
 
 ### Default validators and features (no module needed)
@@ -102,11 +102,17 @@ You can use the function `$.formUtils.addValidator()` to add your own validation
 that checks if the input contains an even number.
 
 ```html
-<html>
-<head>
-  <script src="js/jquery.min.js"></script>
-  <script src="js/formvalidator/jquery.formvalidator.min.js"></script>
-  <script>
+<form action="" method="post" onsubmit="return $(this).validate();">
+    <p>
+        <input type="text" data-validation="even" />
+    </p>
+    ...
+</form>
+<script src="js/jquery.min.js"></script>
+<script src="js/form-validator/jquery.form-validator.min.js"></script>
+<script>
+
+    // Add validator
     $.formUtils.addValidator({
         name : 'even',
         validate : function(value, $el, config, language, $form) {
@@ -115,14 +121,11 @@ that checks if the input contains an even number.
         errorMessage : 'You have to answer an even number',
         errorMessageKey: 'badEvenNumber'
     });
-  </script>
-</head>
-<body>
- ...
- <form action="" method="post" onsubmit="return $(this).validate();">
- <p>
-   <input type="text" data-validation="even" />
- ...
+
+    // Initiate form validation
+    $.setupForm();
+
+</script>
 ```
 
 ### Required properties passed into $.formUtils.addValidator
@@ -157,7 +160,7 @@ URL, so that the browser never caches the file. You should of course never use *
 ```html
 <html>
 <head>
-    <script src="js/formvalidator/jquery.formvalidator.min.js"></script>
+    <script src="js/form-validator/jquery.form-validator.min.js"></script>
     <script>
         $.formUtils.loadModules('mymodule.dev', 'js/validation-modules/');
     </script>
@@ -172,23 +175,7 @@ caches the javascript).
 
 The second argument is the path where the module files is located. This argument is optional, if not given
 the module files has to be located in the same directory as the core modules shipped together with this jquery plugin
-(js/formvalidator/)
-
-## Validate inputs on blur
-It is possible to show that the value of an input is incorrect immediately when the input gets blurred.
-
-```html
-<form action="" onsubmit="return $(this).validate();" id="my_form">
-  <p>
-	  <strong>Website:</strong>
-	  <input type="text" name="website" data-validation="url" />
-	</p>
-	...
-</form>
-<script>
-	$('#my_form').validateOnBlur();
-</script>
-```
+(js/form-validator/)
 
 ## Show help information
 It is possible to display help information for each input. The information will fade in when input is focused and fade out when input looses focus.
@@ -200,10 +187,6 @@ It is possible to display help information for each input. The information will 
 	  <textarea name="why" data-validation-help="Please give us some more information" data-validation="required"></textarea>
 	</p>
 	...
-</form>
-<script>
-	$('#my_form').showHelpOnFocus();
-</script>
 ```
 
 ## Fully customizable
@@ -292,44 +275,22 @@ var enErrorDialogs = {
 ```
 
 ```html
-<html>
-<head>
-    <script src="scripts/jquery.formvalidator.min.js"></script>
-    <script src="scripts/locale.en.js"></script>
+<form action="script.php" onsubmit="return $(this).validate(enErrorDialogs);">
     ...
-<head>
-<body>
-    ...
-    <form action="script.php" onsubmit="return $(this).validate(enErrorDialogs);">
-    ...
+</form>
+<script src="js/jquery.min.js"></script>
+<script src="js/form-validator/jquery.form-validator.min.js"></script>
+<script src="js/form-validator/locale.en.js"></script>
+<script>
+  $.setupForm({
+    language : enErrorDialogs
+  });
+</script>
+...
+
 ```
 
 Inline error messages is also possible. If you add attribute data-validation-error-msg to an element the value of that attribute will be displayed instead of the error dialog that the validation function refers to.
-
-## Simple captcha example
-```php
-<?php
-session_start();
-if( isset($_POST['captcha']) && isset($_SESSION['captcha'])) {
-  if($_POST['captcha'] != ($_SESSION['captcha'][0]+$_SESSION['captcha'][1]))
-    die('Invalid captcha answer');  // client does not have javascript enabled
-}
-
-$_SESSION['captcha'] = array( mt_rand(0,9), mt_rand(1, 9) );
-
-?>
-<html>
-....
-<form action="" onsubmit="return $(this).validate();">
-  <p>
-    What is the sum of <?=$_SESSION['captcha'][0]?> + <?=$_SESSION['captcha'][1]?>? (security question)
-    <input name="captcha" data-validation="spamcheck captcha<?=( $_SESSION['capthca'][0] + $_SESSION['captcha'][1] )?>"
-  </p>
-  <p><input type="submit" /></p>
-</form>
-...
-</html>
-```
 
 ## Input length restriction
 ```html
@@ -338,15 +299,13 @@ $_SESSION['captcha'] = array( mt_rand(0,9), mt_rand(1, 9) );
   <textarea rows="3" id="area"></textarea>
 </p>
 <script type="text/javascript">
-  $('#area').restrictLength($('#maxlength'));
+  $('#area').restrictLength( $('#maxlength') );
 </script>
 ```
 
 ## Password confirmation example
-```html
-  <p>Password: <input type="password" name="pass" data-validation="confirmation" /></p>
-  <p>Confirm password: <input type="password" name="pass_confirmation" /></p>
-```
+
+[Click here for more info](http://formvalidator.net/#security-validators_confirmation)
 
 ## Changelog
 
@@ -358,15 +317,28 @@ $_SESSION['captcha'] = array( mt_rand(0,9), mt_rand(1, 9) );
  * length now looks at attribute data-validation-length to find out how long or short the value must be
  * The validation rule no longer needs to be prefixed with ""
  * Some validation functions is moved to modules (see function reference in top of this document)
+ * Added function $.formSetup() to reduce the amount of code that has to be written when initiating the form validation.
 
-## Maintainer
+
+## Credits
+
+#### Maintainer
 
 [Victor Jonsson](https://github.com/victorjonsson)
 
-## Contributors
-[Joel Sutherland](https://github.com/robamaton) (contributor)<br />
-[Steve Wasiura](https://github.com/stevewasiura) (contributor)<br />
-[Matt Clements](https://github.com/mattclements) (contributor)<br />
-[dfcplc](https://github.com/dfcplc) (contributor)<br />
-[Darren Mason](http://www.mypocket-technologies.com) (Password strength meter)<br />
-[Scott Gonzales](http://projects.scottsplayground.com/iri/) (URL regexp)
+#### Contributors
+<a href="https://github.com/robamaton" target="_blank">Joel Sutherland</a><br />
+<a href="https://github.com/stevewasiura" target="_blank">Steve Wasiura</a><br />
+<a href="https://github.com/mattclements" target="_blank">Matt Clements</a><br />
+<a href="https://github.com/dfcplc" target="_blank">@dfcplc</a><br />
+<a href="https://github.com/coffein" target="_blank">Andree Wendel</a><br />
+<a href="http://www.huotmedia.com" target="_blank">Nicholas Huot</a><br />
+<a href="https://github.com/Repkit" target="_blank">@repkit</a><br />
+<a href="https://github.com/aL3xa" target="_blank">Alexandar Blagotic</a><br />
+<a href="http://thekindof.me/" target="_blank">Yasith Fernando</a><br />
+<a href="https://github.com/S0L4R1S" target="_blank">@S0L4R1S</a><br />
+
+#### Additional credits
+
+<a href="http://projects.scottsplayground.com/iri/" target="_blank">Scott Gonzales</a> (URL regexp)<br />
+<a href="http://www.mypocket-technologies.com" target="_blank">Darren Mason</a> (Password strength meter)
