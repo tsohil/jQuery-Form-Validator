@@ -9,26 +9,35 @@
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
 <form id="dummy-form" style="visibility: hidden"></form>
-<form action="" id="test-form" onsubmit="alert( jQuery(this).validate() ? 'Valid':'Invalid' ); return false; ">
+<form action="" id="test-form">
     <p>
         <strong>Inline suggestions</strong><br />
         <input id="inline-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
     </p>
     <p>
         <strong>Country suggestions</strong><br />
-        <input id="country-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
+        <input id="country-suggestions">
     </p>
     <p>
         <strong>Swedish county suggestions</strong><br />
-        <input id="swedish-county-suggestions" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant">
+        <input id="swedish-county-suggestions">
     </p>
     <p>
         <strong>Display password strength</strong><br />
         <input type="password" id="password">
     </p>
     <p>
-        <strong>Alphanumeric and -_</strong><br>
+        <strong>Alphanumeric and -_ and spaces</strong><br>
         <input name="test" data-validation="alphanumeric" data-validation-allowing="-_ ">
+    </p>
+    <p>
+        <strong>Alphanumeric only</strong><br>
+        <input name="test2" data-validation="alphanumeric">
+    </p>
+    <p>
+        <strong>Must be checked</strong>
+        <br />
+        <input type="checkbox" data-validation="required" />
     </p>
     <p>
         <input type="submit">
@@ -149,10 +158,12 @@
                 {val:'domain.xxx', isValid:true},
                 {val:'domain.com', isValid:true},
                 {val:'www.domain.com', isValid:true},
-                {val:'http://domain.se', isValid:true},
-                {val:'http://www.domain.se', isValid:true},
-                {val:'http://www.domain.se/', isValid:true},
-                {val:'domain.com/', isValid:true},
+                {val:'amazone.website.tippit.de', isValid:true},
+                {val:'amazone.website.co.uk', isValid:true},
+                {val:'http://domain.se', isValid:false},
+                {val:'http://www.domain.se', isValid:false},
+                {val:'http://www.domain.se/', isValid:false},
+                {val:'domain.com/', isValid:false},
                 {val:'', isValid:false}
             ];
 
@@ -288,15 +299,26 @@
     }
 
     var dev = window.location.hash.indexOf('dev') > -1 ? '.dev' : '';
-    $.formUtils.on('load', function() {
-        runAllTests();
-        $('#test-form').addSuggestions();
-        $('#country-suggestions').suggestCountry();
-        $('#swedish-county-suggestions').suggestSwedishCounty();
-        $('#password').displayPasswordStrength();
-    });
 
-    $.formUtils.loadModules('date'+dev+', location'+dev+', security'+dev+', sweden'+dev+', uk'+dev+'');
+    $.setupForm({
+        language : {
+            requiredFields: 'Du måste bocka för denna'
+        },
+        modules : 'date'+dev+', location'+dev+', security'+dev+', sweden'+dev+', uk'+dev,
+        onModulesLoaded: function( $form ) {
+            runAllTests();
+            $('#country-suggestions').suggestCountry();
+            $('#swedish-county-suggestions').suggestSwedishCounty();
+            $('#password').displayPasswordStrength();
+        },
+        onError : function() {
+            alert('Invalid');
+        },
+        onSuccess : function() {
+            alert('Valid');
+            return false;
+        }
+    });
 
 })(jQuery);
 </script>

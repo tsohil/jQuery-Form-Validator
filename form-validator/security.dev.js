@@ -1,18 +1,19 @@
 /**
  * jQuery Form Validator Module: Security
  * ------------------------------------------
- * Created by Victor Jonsson <http://www.victorjonsson.se>
+ * Created by Victor Jonsson <http://victorjonsson.se>
  * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
  *
  * This form validation module adds validators typically used when validating
  * user registration forms. This module adds the following validators:
- *  - validate_spamcheck
- *  - validate_confirmation
- *  - validate_strength
- *  - validate_backend
+ *  - spamcheck
+ *  - confirmation
+ *  - strength
+ *  - backend
  *
+ * @website http://formvalidator.net/#security-validators
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.32
+ * @version 1.9.33
  */
 (function($) {
 
@@ -231,11 +232,6 @@
         }
     });
 
-    var stopFormSubmit = function(e) {
-        e.preventDefault();
-        return false;
-    };
-
     $.formUtils.addValidator({
         oldKeyupEvent : false,
         oldSubmitEvent : false,
@@ -253,7 +249,7 @@
 
 
             $form
-                .bind('submit', stopFormSubmit)
+                .bind('submit', function() {return false;})
                 .addClass('validating-backend');
 
             var backendUrl = document.location.href;
@@ -298,7 +294,7 @@
                                 self.oldKeyupEvent();
                         });
 
-                    $form.unbind('submit', stopFormSubmit);
+                    $form.unbind('submit', function() {return false;});
 
                     // fire submission again!
                     $form.trigger('submit');

@@ -45,6 +45,7 @@ So what has changed since version 1.x?
  * A modular design have been introduced, which means that some validation functions is default and others is
  part of a module.
  * You no longer need to prefix the validation rules with "validate_"
+ * Error message position now defaults to "element"
 
 
 ### Default validators and features (no module needed)
@@ -228,8 +229,8 @@ var myConf = {
 	// Position of error messages. Set the value to "top" if you want the error messages
 	// to be displayed in the top of the form. Otherwise you can set the value to
 	// "element", each error message will then be displayed beside the input field that
-	// it is refering to (default is 'top')
-	errorMessagePosition : 'element',
+	// it is refering to (default is 'element')
+	errorMessagePosition : 'top',
 
 	// Date format used when validating dates and birthdate. (default is yyyy-mm-dd)
 	dateFormat : 'dd/mm/yyyy',

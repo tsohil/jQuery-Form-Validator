@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.32
+* @version 1.9.33
 */
 (function($) {
 
@@ -187,7 +187,7 @@
      */
     $.fn.validate = function(language, config) {
 
-        language = $.extend(language || {}, $.formUtils.LANG);
+        language = $.extend($.formUtils.LANG, language || {});
         config = $.extend($.formUtils.defaultConfig(), config || {});
 
         /**
@@ -233,53 +233,27 @@
             var elementType = $element.attr('type');
             if (!ignoreInput($element.attr('name'), elementType)) {
 
-                // input of type radio
-                if(elementType === 'radio') {
-                    var validationRule = $element.attr(config.validationRuleAttribute);
-                    if (typeof validationRule != 'undefined' && validationRule === 'required') {
-                        var radioButtonName = $element.attr('name');
-                        var isChecked = false;
-                        $form.find('input[name="' + radioButtonName + '"]').each(function() {
-                            if ($(this).is(':checked')) {
-                                isChecked = true;
-                                return false;
-                            }
-                            return true;
-                        });
+                // memorize border color
+                $.formUtils.figureOutDefaultBorderColor($element);
 
-                        if (!isChecked) {
-                            var validationErrorMsg = $element.attr(config.validationErrorMsgAttribute);
-                            $element.valAttr('current-error', validationErrorMsg || language.requiredFields);
-                            errorMessages.push(validationErrorMsg || language.requiredFields);
-                            errorInputs.push($element);
-                        }
-                    }
+                var validation = $.formUtils.validateInput(
+                                $element,
+                                language,
+                                config,
+                                $form
+                            );
+
+                if(validation !== true) {
+                    errorInputs.push($element);
+                    addErrorMessage(validation);
+                    $element
+                        .valAttr('current-error', validation)
+                        .removeClass('valid');
                 }
-                // inputs, textareas and select lists
                 else {
-
-                    // memorize border color
-                    $.formUtils.figureOutDefaultBorderColor($element);
-
-                    var valid = $.formUtils.validateInput(
-                                    $element,
-                                    language,
-                                    config,
-                                    $form
-                                );
-
-                    if(valid !== true) {
-                        errorInputs.push($element);
-                        addErrorMessage(valid);
-                        $element
-                            .valAttr('current-error', valid)
-                            .removeClass('valid');
-                    }
-                    else {
-                        $element
-                            .valAttr('current-error', false)
-                            .addClass('valid');
-                    }
+                    $element
+                        .valAttr('current-error', false)
+                        .addClass('valid');
                 }
             }
 
@@ -406,6 +380,74 @@
         }
     };
 
+    /**
+     * Short hand function that makes the validation setup require less code
+     * @param config
+     */
+    $.setupForm = function(config) {
+        config = $.extend({
+            form : 'form',
+            validateOnBlur : true,
+            showHelpOnFocus : true,
+            addSuggestions : true,
+            modules : '',
+            onModulesLoaded : null,
+            language : false,
+            onSuccess : false,
+            onError : false
+        }, config || {});
+
+        $.split(config.form, function(formQuery) {
+            var $form  = $(formQuery);
+
+            // Validate when submitted
+            $form.bind('submit', function() {
+                if($.formUtils.isLoadingModules) {
+                    setTimeout(function() {
+                        $form.trigger('submit');
+                    }, 200);
+                    return false;
+                }
+                var valid = $(this).validate(config.language, config);
+                if( valid && typeof config.onSuccess == 'function') {
+                    var callbackResponse = config.onSuccess($form);
+                    if( callbackResponse === false )
+                        return false;
+                } else if ( !valid && typeof config.onError == 'function' ) {
+                    config.onError($form);
+                    return false;
+                } else {
+                    return valid;
+                }
+            });
+
+            if( config.validateOnBlur ) {
+                $form.validateOnBlur(config.language, config);
+            }
+            if( config.showHelpOnFocus ) {
+                $form.showHelpOnFocus();
+            }
+
+            if( config.addSuggestions ) {
+                $form.addSuggestions();
+            }
+        });
+
+        if( config.modules != '' ) {
+            if( typeof config.onModulesLoaded == 'function' ) {
+                $.formUtils.on('load', function() {
+                    $.split(config.form, function(formQuery) {
+                        config.onModulesLoaded( $(formQuery) );
+                    });
+                });
+            }
+            $.formUtils.loadModules(config.modules);
+        }
+    };
+
+    /**
+     * Object containing utility methods for this plugin
+     */
     $.formUtils = {
 
         /**
@@ -419,7 +461,7 @@
                 errorMessageClass : 'jquery_form_error_message', // class name of div containing error messages when validation fails
                 validationRuleAttribute : 'data-validation', // name of the attribute holding the validation rules
                 validationErrorMsgAttribute : 'data-validation-error-msg', // define custom err msg inline with element
-                errorMessagePosition : 'top', // Can be either "top" or "element"
+                errorMessagePosition : 'element', // Can be either "top" or "element"
                 scrollToTopOnError : true,
                 dateFormat : 'yyyy-mm-dd'
             }
@@ -488,6 +530,11 @@
         },
 
         /**
+         * @ {Boolean}
+         */
+        isLoadingModules : false,
+
+        /**
         * @example
         *  $.formUtils.loadModules('date, security.dev');
         *
@@ -510,9 +557,14 @@
                     moduleLoadedCallback = function() {
                         numModules--;
                         if( numModules == 0 ) {
+                            $.formUtils.isLoadingModules = false;
                             $.formUtils.trigger('load', path);
                         }
                     };
+
+                if( numModules > 0 ) {
+                    $.formUtils.isLoadingModules = true;
+                }
 
                 $.each(moduleList, function(i, modName) {
                     modName = $.trim(modName);
@@ -581,13 +633,7 @@
         */
         validateInput : function($element, language, config, $form) {
 
-            // Multiple select
-            if( $element.get(0).nodeName == 'SELECT' && $element.attr('multiple') ) {
-                return this.validateMultipleSelect($element.val(), $element, config, language);
-            }
-
-            var value = $.trim($element.val());
-            value = value || '';
+            var value = $.trim( $element.val() || '' );
             var optional = $element.valAttr('optional');
 
             // test if a checkbox forces this element to be validated
@@ -658,26 +704,6 @@
                 $.formUtils.trigger('valid', $element);
                 return true;
             }
-        },
-
-        /**
-         * @param {Array} values
-         * @param {jQuery} $el
-         * @param {Object} config
-         * @param {Object} language - $.formUtils.LANG
-         * @return {Boolean|String}
-         */
-        validateMultipleSelect : function(values, $el, config, language) {
-            values = values || [];
-            var validationRules = $el.attr(config.validationRuleAttribute);
-            var validationErrorMsg = $el.attr(config.validationErrorMsgAttribute);
-            if(validationRules.indexOf('validate_num_answers') > -1) {
-                var num = this.getAttributeInteger(validationRules, 'num');
-                if(num > values.length) {
-                    return validationErrorMsg || (language.badNumberOfSelectedOptionsStart +num+ language.badNumberOfSelectedOptionsEnd);
-                }
-            }
-            return true;
         },
 
        /**
@@ -769,27 +795,31 @@
         * @return void
         */
         lengthRestriction : function($inputElement, $maxLengthElement) {
-           // read maxChars from counter display initial text value
-           var maxChars = parseInt($maxLengthElement.text(),10);
+                // read maxChars from counter display initial text value
+           var maxChars = parseInt($maxLengthElement.text(),10),
+
+               // internal function does the counting and sets display value
+               countCharacters = function() {
+                   var numChars = $inputElement.val().length;
+                   if(numChars > maxChars) {
+                       // get current scroll bar position
+                       var currScrollTopPos = $inputElement.scrollTop();
+                       // trim value to max length
+                       $inputElement.val($inputElement.val().substring(0, maxChars));
+                       $inputElement.scrollTop(currScrollTopPos);
+                   }
+                   // set counter text
+                   $maxLengthElement.text(maxChars - numChars);
+               };
 
            // bind events to this element
            // setTimeout is needed, cut or paste fires before val is available
            $($inputElement).bind('keydown keyup keypress focus blur',  countCharacters )
                .bind('cut paste', function(){ setTimeout(countCharacters, 100); } ) ;
 
-           // internal function does the counting and sets display value
-           function countCharacters() {
-               var numChars = $inputElement.val().length;
-               if(numChars > maxChars) {
-                   // get current scroll bar position
-                   var currScrollTopPos = $inputElement.scrollTop();
-                   // trim value to max length
-                   $inputElement.val($inputElement.val().substring(0, maxChars));
-                   $inputElement.scrollTop(currScrollTopPos);
-               }
-               // set counter text
-               $maxLengthElement.text(maxChars - numChars);
-           }
+           // count chars on pageload, if there are prefilled input-values
+           $(document).bind("ready", countCharacters);
+
         },
 
         _numSuggestionElements : 0,
@@ -1056,12 +1086,6 @@
         name : 'validate_domain',
         validate : function(val, $input) {
 
-            // Clean up
-            val = val.toLowerCase();
-            val = val.replace('ftp://', '').replace('https://', '').replace('http://', '').replace('www.', '');
-            if(val.substr(-1) == '/')
-                val = val.substr(0, val.length-1);
-
             var topDomains = ['.com', '.net', '.org', '.biz', '.coop', '.info', '.museum', '.name', '.pro',
                     '.edu', '.gov', '.int', '.mil', '.ac', '.ad', '.ae', '.af', '.ag', '.ai', '.al',
                     '.am', '.an', '.ao', '.aq', '.ar', '.as', '.at', '.au', '.aw', '.az', '.ba', '.bb',
@@ -1209,8 +1233,8 @@
         validate : function(url) {
             // written by Scott Gonzalez: http://projects.scottsplayground.com/iri/ but added support for arrays in the url ?arg[]=sdfsdf
             var urlFilter = /^(https|http|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|\[|\]|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
-            if(urlFilter.test(url)) {
-                var domain = url.split(/^https|^http|^ftp/i)[1].replace('://', '');
+            if( urlFilter.test(url) ) {
+                var domain = url.split('://')[1];
                 var domainSlashPos = domain.indexOf('/');
                 if(domainSlashPos > -1)
                     domain = domain.substr(0, domainSlashPos);
