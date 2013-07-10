@@ -40,6 +40,11 @@
         <input type="checkbox" data-validation="required" />
     </p>
     <p>
+        <strong>Even numbers only</strong>
+        <br />
+        <input data-validation="even_number">
+    </p>
+    <p>
         <input type="submit">
     </p>
 </form>
@@ -241,7 +246,7 @@
         });
 
         /*
-         * LENGTH VALIDATION
+         * DATE VALIDATION
          */
         test("Date validation", function() {
 
@@ -261,7 +266,9 @@
                 {val:input('29/02/2000', {'format':'dd/mm/yyyy', '':'date'}), isValid:true},
                 {val:input('29/02/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
                 {val:input('29/13/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
-                {val:input('29/00/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false}
+                {val:input('29/00/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
+                {val:'2014-01-01', isValid:true},
+                {val:'1880-01-01', isValid:true}
             ];
 
             $.each(dates, function(i, obj) {
@@ -270,7 +277,66 @@
         });
 
         /*
-         * DATE VALIDATION
+         * BIRTH DATE VALIDATION
+         */
+        test("Birth date validation", function() {
+
+            clearForm();
+
+            var dates = [
+                {val:'2000-01-01', isValid:true},
+                {val:'2000-01-1', isValid:false},
+                {val:'2000-01-32', isValid:false},
+                {val:'2000-02-29', isValid:true}, // leap year
+                {val:'2013-02-29', isValid:false},
+                {val:'2000-04-31', isValid:false},
+                {val:'2000-13-1', isValid:false},
+                {val:'2000-1-1', isValid:false},
+                {val:'-01-01', isValid:false},
+                {val:input('01/01/2000', {'format':'dd/mm/yyyy', '':'date'}), isValid:true},
+                {val:input('29/02/2000', {'format':'dd/mm/yyyy', '':'date'}), isValid:true},
+                {val:input('29/02/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
+                {val:input('29/13/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
+                {val:input('29/00/2013', {'format':'dd/mm/yyyy', '':'date'}), isValid:false},
+                {val:'2014-01-01', isValid:false}, // no future date
+                {val:'1880-01-01', isValid:false} // no date that is to old
+            ];
+
+            $.each(dates, function(i, obj) {
+                runTest(obj, 'birthdate');
+            });
+        });
+
+        /*
+         * TIME VALIDATION
+         */
+        test("Time validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val:'00:00', isValid:true},
+                {val:'00:01', isValid:true},
+                {val:'09:59', isValid:true},
+                {val:'19:59', isValid:true},
+                {val:'19:60', isValid:false},
+                {val:'19:61', isValid:false},
+                {val:'24:01', isValid:false},
+                {val:'24:00', isValid:false},
+                {val:'2200', isValid:false},
+                {val:'', isValid:false},
+                {val:'23', isValid:false},
+                {val:'23;00', isValid:false},
+                {val:'23-00', isValid:false}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'time');
+            });
+        });
+
+        /*
+         * LENGTH VALIDATION
          */
         test("Length validation", function() {
 
@@ -304,8 +370,9 @@
         language : {
             requiredFields: 'Du måste bocka för denna'
         },
-        modules : 'date'+dev+', location'+dev+', security'+dev+', sweden'+dev+', uk'+dev,
+        modules : 'security'+dev+', location'+dev+', sweden'+dev+', uk'+dev,
         onModulesLoaded: function( $form ) {
+            console.log('About to run all tests');
             runAllTests();
             $('#country-suggestions').suggestCountry();
             $('#swedish-county-suggestions').suggestSwedishCounty();
@@ -318,6 +385,19 @@
             alert('Valid');
             return false;
         }
+    });
+
+    // Load one module outside $.setupForm() and add file extension even though you do not have to
+    $.formUtils.loadModules('date'+dev+'.js', false, false);
+
+    // Add a new validator
+    $.formUtils.addValidator({
+        name : 'even_number',
+        validate : function(value, $el, config, language, $form) {
+            return parseInt(value, 10) % 2 === 0;
+        },
+        errorMessage : 'You have to give an even number',
+        errorMessageKey: 'badEvenNumber'
     });
 
 })(jQuery);

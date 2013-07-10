@@ -12,7 +12,7 @@
  *
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.33
+ * @version 1.9.34
  */
 (function($) {
 
@@ -27,7 +27,7 @@
             } else {
                 var hours = parseInt(time.split(':')[0],10);
                 var minutes = parseInt(time.split(':')[1],10);
-                if((hours > 24 || minutes > 59) || (hours === 24 && minutes > 0)) {
+                if( hours > 23 || minutes > 59 ) {
                     return false;
                 }
             }

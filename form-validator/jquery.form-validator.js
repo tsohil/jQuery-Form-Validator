@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.33
+* @version 1.9.34
 */
 (function($) {
 
@@ -343,7 +343,7 @@
             sugs = $.split($field.attr('data-suggestions'));
 
             if( sugs.length > 0 ) {
-                new $.formUtils.suggest($field, sugs, settings);
+                $.formUtils.suggest($field, sugs, settings);
             }
         });
         return this;
@@ -436,9 +436,7 @@
         if( config.modules != '' ) {
             if( typeof config.onModulesLoaded == 'function' ) {
                 $.formUtils.on('load', function() {
-                    $.split(config.form, function(formQuery) {
-                        config.onModulesLoaded( $(formQuery) );
-                    });
+                    config.onModulesLoaded();
                 });
             }
             $.formUtils.loadModules(config.modules);
@@ -546,10 +544,21 @@
         * The script will be cached by the browser unless the module
         * name ends with .dev
         *
-        * @param {String} modules - Comma separated string
-        * @param {String} path - Optional
+        * @param {String} modules - Comma separated string with module file names (no directory nor file extension)
+        * @param {String} [path] - Optional, path where the module files is located if their not in the same directory as the core modules
+        * @param {Boolean} [fireEvent] - Optional, whether or not to fire event 'load' when modules finished loading
         */
-        loadModules : function(modules, path) {
+        loadModules : function(modules, path, fireEvent) {
+
+            if( fireEvent === undefined )
+                fireEvent = true;
+
+            if( $.formUtils.isLoadingModules ) {
+                setTimeout(function() {
+                    $.formUtils.loadModules(modules, path, fireEvent);
+                });
+                return;
+            }
 
             var loadModuleScripts = function(modules, path) {
                 var moduleList = $.split(modules),
@@ -558,7 +567,9 @@
                         numModules--;
                         if( numModules == 0 ) {
                             $.formUtils.isLoadingModules = false;
-                            $.formUtils.trigger('load', path);
+                            if( fireEvent ) {
+                                $.formUtils.trigger('load', path);
+                            }
                         }
                     };
 
