@@ -39,13 +39,13 @@ particular form.
 
 So what has changed since version 1.x?
 
- * A whole bunch of validation functions have been added (see below)
+ * A whole bunch of validation functions have been added (see below).
  * A modular design have been introduced, which means that some validation functions is default and others is
  part of a module. This in turn reduces server and bandwidth costs.
- * You no longer need to prefix the validation rules with "validate_"
- * Error message position now defaults to "element"
- * The optional features (validatOnBlur and showHelpOnFocus) is now enabled by default
- * The function $.setForm is introduced that makes it possible to initiate the form validation with less code
+ * You no longer need to prefix the validation rules with "validate_".
+ * Error message position now defaults to "element".
+ * The optional features (validateOnBlur and showHelpOnFocus) is now enabled by default.
+ * The function $.setupForm(config) is introduced to reduce the amount of code that needs to be written when initiating the form validation.
 
 
 ### Default validators and features (no module needed)
@@ -58,7 +58,6 @@ So what has changed since version 1.x?
  * **length** — *min/max/range*
  * **required** — *no validation except that a value has to be given*
  * **custom** — *Validate value against regexp*
- * **num_answers** — *Validate that a select element has the required number of selected options (num_answers num5)*
  * Show help information automatically when input is focused
  * Validate given values immediately when input looses focus.
  * Make validation dependent on another input of type checkbox being checked by adding attribute data-validation-if-checked="name of checkbox input"
@@ -68,15 +67,21 @@ So what has changed since version 1.x?
  data-validation-if-checked="name of checkbox input"
  * Create input suggestions with ease, no jquery-ui needed
 
+Read the documentation for the [default features at http://formvalidator.net/##default-validators](http://formvalidator.net/#default-validators)
+
 ### Module: security
  * **spamcheck**
  * **confirmation**
  * **strength** — *Validate the strength of a password (strength strength3)*
  * **backend** — *Validate value of input on backend*
 
+Read the documentation for the [security module at http://formvalidator.net/#default-validators](http://formvalidator.net/#security-validators)
+
 ### Module: date
  * **time** — *hh:mm*
  * **birthdate** — *yyyy-mm-dd, not allowing dates in the future or dates that's older than 122 years (format can be customized, more information below)*
+
+Read the documentation for the [date module at http://formvalidator.net/#default-validators](http://formvalidator.net/#date-validators)
 
 ### Module: location
  * **country**
@@ -84,6 +89,8 @@ So what has changed since version 1.x?
  * **longlat**
  * Suggest countries (english only)
  * Suggest states in the US
+
+Read the documentation for the [location module at http://formvalidator.net/#default-validators](http://formvalidator.net/#location-validators)
 
 ### Module: sweden
  * **swemob** — *validate that the value is a swedish mobile telephone number*
@@ -93,8 +100,12 @@ So what has changed since version 1.x?
  * Suggest county
  * Suggest municipality
 
-### Module: ukvat
+Read the documentation for the [Swedish module at http://formvalidator.net/#default-validators](http://formvalidator.net/#sweden-validators)
+
+### Module: uk
  * **ukvatnumber**
+
+Read the documentation for the [UK module at http://formvalidator.net/#default-validators](http://formvalidator.net/#uk-validators)
 
 
 ## Writing a custom validator
@@ -102,7 +113,7 @@ You can use the function `$.formUtils.addValidator()` to add your own validation
 that checks if the input contains an even number.
 
 ```html
-<form action="" method="post" onsubmit="return $(this).validate();">
+<form action="" method="POST">
     <p>
         <input type="text" data-validation="even" />
     </p>
@@ -287,7 +298,6 @@ var enErrorDialogs = {
   });
 </script>
 ...
-
 ```
 
 Inline error messages is also possible. If you add attribute data-validation-error-msg to an element the value of that attribute will be displayed instead of the error dialog that the validation function refers to.
