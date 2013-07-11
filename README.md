@@ -45,7 +45,7 @@ So what has changed since version 1.x?
  * You no longer need to prefix the validation rules with "validate_".
  * Error message position now defaults to "element".
  * The optional features (validateOnBlur and showHelpOnFocus) is now enabled by default.
- * The function $.setupForm(config) is introduced to reduce the amount of code that needs to be written when initiating the form validation.
+ * The function $.setupForm(config) is introduced to reduce the amount of code that has to be written when initiating the form validation.
 
 
 ### Default validators and features (no module needed)
@@ -67,7 +67,7 @@ So what has changed since version 1.x?
  data-validation-if-checked="name of checkbox input"
  * Create input suggestions with ease, no jquery-ui needed
 
-Read the documentation for the [default features at http://formvalidator.net/##default-validators](http://formvalidator.net/#default-validators)
+Read the documentation for the default features at [http://formvalidator.net/#default-validators](http://formvalidator.net/#default-validators)
 
 ### Module: security
  * **spamcheck**
@@ -75,13 +75,13 @@ Read the documentation for the [default features at http://formvalidator.net/##d
  * **strength** — *Validate the strength of a password (strength strength3)*
  * **backend** — *Validate value of input on backend*
 
-Read the documentation for the [security module at http://formvalidator.net/#default-validators](http://formvalidator.net/#security-validators)
+Read the documentation for the security module at [http://formvalidator.net/#security-validators](http://formvalidator.net/#security-validators)
 
 ### Module: date
  * **time** — *hh:mm*
  * **birthdate** — *yyyy-mm-dd, not allowing dates in the future or dates that's older than 122 years (format can be customized, more information below)*
 
-Read the documentation for the [date module at http://formvalidator.net/#default-validators](http://formvalidator.net/#date-validators)
+Read the documentation for the date module at [http://formvalidator.net/#date-validators](http://formvalidator.net/#date-validators)
 
 ### Module: location
  * **country**
@@ -90,7 +90,7 @@ Read the documentation for the [date module at http://formvalidator.net/#default
  * Suggest countries (english only)
  * Suggest states in the US
 
-Read the documentation for the [location module at http://formvalidator.net/#default-validators](http://formvalidator.net/#location-validators)
+Read the documentation for the location module at [http://formvalidator.net/#location-validators](http://formvalidator.net/#location-validators)
 
 ### Module: sweden
  * **swemob** — *validate that the value is a swedish mobile telephone number*
@@ -100,12 +100,12 @@ Read the documentation for the [location module at http://formvalidator.net/#def
  * Suggest county
  * Suggest municipality
 
-Read the documentation for the [Swedish module at http://formvalidator.net/#default-validators](http://formvalidator.net/#sweden-validators)
+Read the documentation for the Swedish module at [http://formvalidator.net/#sweden-validators](http://formvalidator.net/#sweden-validators)
 
 ### Module: uk
  * **ukvatnumber**
 
-Read the documentation for the [UK module at http://formvalidator.net/#default-validators](http://formvalidator.net/#uk-validators)
+Read the documentation for the UK module at [http://formvalidator.net/#uk-validators](http://formvalidator.net/#uk-validators)
 
 
 ## Writing a custom validator
@@ -148,7 +148,7 @@ that checks if the input contains an even number.
 *errorMessageKey* - Name of language property that is used in case the value of the input is invalid.
 
 *errorMessage* - An alternative error message that is used if errorMessageKey is left with an empty value or isn't defined
-in the language object. Note that you also can use [inline error messages](#localization) in your form.
+in the language object. Note that you also can use [inline error messages](http://formvalidator.net/#localization) in your form.
 
 
 The validation function takes these five arguments:
@@ -192,7 +192,7 @@ the module files has to be located in the same directory as the core modules shi
 It is possible to display help information for each input. The information will fade in when input is focused and fade out when input looses focus.
 
 ```html
-<form action="" onsubmit="return $(this).validate();" id="my_form">
+<form action="" id="my_form">
 	<p>
 	  <strong>Why not:</strong>
 	  <textarea name="why" data-validation-help="Please give us some more information" data-validation="required"></textarea>
@@ -201,56 +201,8 @@ It is possible to display help information for each input. The information will 
 ```
 
 ## Fully customizable
-```javascript
-var myConf = {
-	// Name of element attribute holding the validation rules (default is data-validation)
-	validationRuleAttribute : 'class',
 
-	// Names of inputs not to be validated even though the element attribute containing
-	// the validation rules tells us to
-	ignore : ['som-name', 'other-name'],
-
-	// Class that will be put on elements which value is invalid (default is 'error')
-	errorElementClass : 'error',
-
-	// Border color of elements which value is invalid, empty string to leave border
-	// color as it is
-	borderColorOnError : '#FFF',
-
-	// Class of div container showing error messages (defualt is 'error_message')
-	errorMessageClass : 'error_message',
-
-	// Position of error messages. Set the value to "top" if you want the error messages
-	// to be displayed in the top of the form. Otherwise you can set the value to
-	// "element", each error message will then be displayed beside the input field that
-	// it is refering to (default is 'element')
-	errorMessagePosition : 'top',
-
-	// Date format used when validating dates and birthdate. (default is yyyy-mm-dd)
-	dateFormat : 'dd/mm/yyyy',
-
-	// Window automatically scrolls to the top of the form when submitted data is
-	// invalid (default is true)
-	scrollToTopOnError : false,
-
-	// Name of the element attribute containing the error message that will be
-	// displayed instead of the error dialog that the validation function
-	// referrs to (default is data-validation-error-msg)
-	validationErrorMsgAttribute : 'data-error'
-};
-
-var myLang = {
-	errorTitle : 'Något gick fel',
-	requiredFields : 'Du fyllde inte i alla fält markerade med *'
-};
-
-$('#my_form')
-  .showHelpOnFocus()
-  .validateOnBlur(myLang, myConf)
-  .submit(function() {
-    return $(this).validate(myLang, myConf);
-  });
-```
+Read about how to customize this plugin over at [http://formvalidator.net/#configuration](http://formvalidator.net/#configuration)
 
 ## Localization
 This plugin contains a set of error dialogs. In case you don't define an inline error message the plugin
@@ -300,7 +252,8 @@ var enErrorDialogs = {
 ...
 ```
 
-Inline error messages is also possible. If you add attribute data-validation-error-msg to an element the value of that attribute will be displayed instead of the error dialog that the validation function refers to.
+Inline error messages is also possible. If you add attribute `data-validation-error-msg` to an element the value of
+that attribute will be displayed instead of the error dialog that the validation function refers to.
 
 ## Input length restriction
 ```html
@@ -313,19 +266,15 @@ Inline error messages is also possible. If you add attribute data-validation-err
 </script>
 ```
 
-## Password confirmation example
-
-[Click here for more info](http://formvalidator.net/#security-validators_confirmation)
-
 ## Changelog
 
 #### 2.0
  * [min|max]_length is removed (now merged with length)
- * number, int, float is merged together, all three variants is now validated by number
+ * number, int, float is merged together, all three variants is now validated by the number validation
  * phone moved to "sweden" module and renamed to swephone
- * The attribute to be used when defining the regular expression for custom is now moved to its own attribute (data-validation-regexp)
- * length now looks at attribute data-validation-length to find out how long or short the value must be
- * The validation rule no longer needs to be prefixed with ""
+ * The attribute to be used when defining the regular expression for custom validations is now moved to its own attribute (data-validation-regexp)
+ * Length validation now looks at attribute data-validation-length to find out how long or short the value must be
+ * The validation rule no longer needs to be prefixed with "validate_" (it's still possible to use the prefix but it's considered deprecated)
  * Some validation functions is moved to modules (see function reference in top of this document)
  * Added function $.formSetup() to reduce the amount of code that has to be written when initiating the form validation.
 
