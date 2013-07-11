@@ -269,13 +269,13 @@ that attribute will be displayed instead of the error dialog that the validation
 ## Changelog
 
 #### 2.0
- * [min|max]_length is removed (now merged with length validation)
- * number, int, float is merged together, all three variants is now validated by the number validation
- * phone moved to "sweden" module and renamed to swephone
+ * [min|max]_length is removed (now merged with length validation).
+ * The number, int and float validation is merged together, all three variants is now validated by the number validation.
+ * Phone validation is moved to "sweden" module and renamed to swephone.
  * The attribute to be used when defining the regular expression for custom validations is now moved to its own attribute (data-validation-regexp)
- * Length validation now looks at attribute data-validation-length (eg. min5, max200, 3-12)
- * The validation rule no longer needs to be prefixed with "validate_" (it's still possible to use the prefix but it's considered deprecated)
- * Some validation functions is moved to modules (see function reference in top of this document)
+ * Length validation now looks at attribute data-validation-length (eg. min5, max200, 3-12).
+ * The validation rule no longer needs to be prefixed with "validate_" (it's still possible to use the prefix but it's considered deprecated).
+ * Some validation functions is moved to modules (see the function reference over at http://formvalidator.net).
  * Added function $.formSetup() to reduce the amount of code that has to be written when initiating the form validation.
 
 
