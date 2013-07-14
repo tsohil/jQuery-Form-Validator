@@ -13,7 +13,7 @@
  *  - validate_swephone
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.35
+ * @version 1.9.36
  */
 (function($, window) {
 
@@ -22,14 +22,25 @@
     */
     $.formUtils.addValidator({
         name : 'validate_swesec',
-        validate : function(securityNumber) {
+        validate : function(securityNumber, $input) {
+
+            var year, month, day, ssnParts;
+
+            if( $input.valAttr('use-hyphen') ) {
+                ssnParts = securityNumber.split('-');
+                if( ssnParts.length != 2 ) {
+                    return false;
+                }
+                securityNumber = ssnParts.join('');
+            }
+
             if (!securityNumber.match(/^(\d{4})(\d{2})(\d{2})(\d{4})$/)) {
                 return false;
             }
 
-            var year = RegExp.$1;
-            var month = $.formUtils.parseDateInt(RegExp.$2);
-            var day = $.formUtils.parseDateInt(RegExp.$3);
+            year = RegExp.$1;
+            month = $.formUtils.parseDateInt(RegExp.$2);
+            day = $.formUtils.parseDateInt(RegExp.$3);
 
             window.ssnGender = ( parseInt( (RegExp.$4).substring(2,3) ) % 2 ) === 0 ? 'female':'male';
 

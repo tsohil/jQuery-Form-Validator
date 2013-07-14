@@ -370,6 +370,32 @@
             });
         });
 
+        /*
+         * SWEDISH SSN VALIDATION
+         */
+        test("Swedish SSN validation", function() {
+
+            clearForm();
+
+            var links = [
+                {val:'19:59', isValid:false},
+                {val:'', isValid:false},
+                {val:'198311084936', isValid:true},
+                {val:'198311084935', isValid:false},
+                {val:'198301128529', isValid:true},
+                {val:'198301128528', isValid:false},
+                {val:input('', {'use-hyphen' : 'true', '':'swesec'}), isValid:false},
+                {val:input('198301128529', {'use-hyphen' : 'true', '':'swesec'}), isValid:false},
+                {val:input('198311084936', {'use-hyphen' : 'true', '':'swesec'}), isValid:false},
+                {val:input('19830112-8529', {'use-hyphen' : 'true', '':'swesec'}), isValid:true},
+                {val:input('19831108-4936', {'use-hyphen' : 'true', '':'swesec'}), isValid:true}
+            ];
+
+            $.each(links, function(i, obj) {
+                runTest(obj, 'swesec');
+            });
+        });
+
         // TODO: Write more tests...
 
     }
