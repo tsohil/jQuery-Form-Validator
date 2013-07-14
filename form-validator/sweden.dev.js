@@ -13,9 +13,9 @@
  *  - validate_swephone
  *
  * @license Dual licensed under the MIT or GPL Version 2 licenses
- * @version 1.9.34
+ * @version 1.9.35
  */
-(function($) {
+(function($, window) {
 
     /*
     * Validate swedish social security number yyyymmddXXXX
@@ -31,7 +31,7 @@
             var month = $.formUtils.parseDateInt(RegExp.$2);
             var day = $.formUtils.parseDateInt(RegExp.$3);
 
-            // var gender = parseInt( (RegExp.$4) .substring(2,3)) % 2; ==> 1 === male && 0 === female
+            window.ssnGender = ( parseInt( (RegExp.$4).substring(2,3) ) % 2 ) === 0 ? 'female':'male';
 
             var months = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
             if (year % 400 === 0 || year % 4 === 0 && year % 100 !== 0) {
@@ -196,4 +196,4 @@
         return $.formUtils.suggest(this, municipalities, settings);
     };
 
-})(jQuery);
+})(jQuery, window);

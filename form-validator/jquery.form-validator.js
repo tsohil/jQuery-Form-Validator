@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.34
+* @version 1.9.35
 */
 (function($) {
 
@@ -194,11 +194,16 @@
          * Adds message to error message stack if not already in the message stack
          *
          * @param {String} mess
+         * @para {jQuery} $element
          */
-        var addErrorMessage = function(mess) {
+        var addErrorMessage = function(mess, $element) {
             if ($.inArray(mess, errorMessages) < 0) {
                 errorMessages.push(mess);
             }
+            errorInputs.push($element);
+            $element
+                .valAttr('current-error', mess)
+                .removeClass('valid');
         };
 
         /** Error messages for this validation */
@@ -244,13 +249,8 @@
                             );
 
                 if(validation !== true) {
-                    errorInputs.push($element);
-                    addErrorMessage(validation);
-                    $element
-                        .valAttr('current-error', validation)
-                        .removeClass('valid');
-                }
-                else {
+                    addErrorMessage(validation, $element);
+                } else {
                     $element
                         .valAttr('current-error', false)
                         .addClass('valid');
@@ -276,6 +276,15 @@
         $('.' + $.split(config.errorMessageClass, ' ').join('.')).remove();
         $('.jquery_form_error_message').remove();
 
+        //
+        // Run validation callback
+        //
+        if( typeof config.onValidate == 'function' ) {
+            var resp = config.onValidate($form);
+            if( resp && resp.element && resp.message ) {
+                addErrorMessage(resp.message, resp.element);
+            }
+        }
 
         //
         // Validation failed

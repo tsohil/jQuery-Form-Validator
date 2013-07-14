@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <title>QUnit Tests</title>
     <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css">
+    <style>
+        .jquery_form_error_message {
+            color: darkred;
+        }
+    </style>
 </head>
 <body>
 <div id="qunit"></div>
@@ -43,6 +48,11 @@
         <strong>Even numbers only</strong>
         <br />
         <input data-validation="even_number">
+    </p>
+    <p>
+        Callback validation, set this value to &quot;1&quot; and
+        validation will fail<br />
+        <input id="callback" />
     </p>
     <p>
         <input type="submit">
@@ -206,7 +216,7 @@
 
             var links = [
                 {val:'a', isValid:true},
-                {val:'asdvs1', isValid:true},
+                {val:'asdXAvs1', isValid:true},
                 {val:'a  b', isValid:false},
                 {val:'a-_ bäöåA', isValid:false},
                 {val:input('a b', {'allowing':' ', '':'alphanumeric'}), isValid:true},
@@ -378,6 +388,15 @@
             $('#swedish-county-suggestions').suggestSwedishCounty();
             $('#password').displayPasswordStrength();
         },
+        onValidate : function() {
+            var $callbackInput = $('#callback');
+            if( $callbackInput.val() == 1 ) {
+                return {
+                    element : $callbackInput,
+                    message : 'This validation was made in a callback'
+                };
+            }
+        },
         onError : function() {
             alert('Invalid');
         },
@@ -387,7 +406,7 @@
         }
     });
 
-    // Load one module outside $.setupForm() and add file extension even though you do not have to
+    // Load one module outside $.setupForm() even though you do not have to
     $.formUtils.loadModules('date'+dev+'.js', false, false);
 
     // Add a new validator
