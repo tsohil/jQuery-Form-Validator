@@ -13,9 +13,9 @@
         "url": "http://victorjonsson.se",
         "email" : "kontakt@victorjonsson.se"
     },
-    "homepage" : "https://www.formvalidator.net",
-    "demo" : "https://www.formvalidator.net",
-    "download" : "https://raw.github.com/victorjonsson/jQuery-Form-Validator/master/jquery.formvalidator.min.js",
+    "homepage" : "http://formvalidator.net",
+    "demo" : "http://formvalidator.net",
+    "download" : "http://formvalidator.net",
     "bugs" : "https://github.com/victorjonsson/jQuery-Form-Validator/issues",
     "licenses" : [{
         "type": "Dual licensed under the MIT or GPL Version 2 licenses",

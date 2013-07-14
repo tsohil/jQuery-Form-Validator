@@ -1,4 +1,6 @@
-**jQuery Form Validator** is a feature rich jQuery plugin that makes it easy to validate user input while keeping your
+# jQuery Form Validator
+
+With this feature rich jQuery plugin it becomes easy to validate user input while keeping your
  HTML markup clean from javascript code. Even though this plugin has **a wide range of validation functions**
 it's designed to require as little bandwidth as possible. This is achieved by grouping together validation functions
 in "modules", making it possible for the programmer to load **only those functions that's needed** to validate a
@@ -46,7 +48,7 @@ So what has changed since version 1.x?
  * Error message position now defaults to "element".
  * The optional features (validateOnBlur and showHelpOnFocus) is now enabled by default.
  * The function $.setupForm(config) is introduced to reduce the amount of code that has to be written when initiating the form validation.
-
+ * Demos and full documentation is now available at http://formvalidator.net/
 
 ### Default validators and features (no module needed)
  * **url**
