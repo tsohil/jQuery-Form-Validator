@@ -43,7 +43,7 @@ So what has changed since version 1.x?
 
  * A whole bunch of validation functions have been added (see below).
  * A modular design have been introduced, which means that some validation functions is default and others is
- part of a module. This in turn reduces server and bandwidth costs.
+ part of a module. This in turn lowers server and bandwidth costs.
  * You no longer need to prefix the validation rules with "validate_".
  * Error message position now defaults to "element".
  * The optional features (validateOnBlur and showHelpOnFocus) is now enabled by default.
@@ -62,7 +62,6 @@ So what has changed since version 1.x?
  * **custom** — *Validate value against regexp*
  * Show help information automatically when input is focused
  * Validate given values immediately when input looses focus.
- * Make validation dependent on another input of type checkbox being checked by adding attribute data-validation-if-checked="name of checkbox input"
  * Make validation optional by adding attribute data-validation-optional="true" to the element. This means
  that the validation defined in data-validation only will take place in case a value is given.
  * Make validation dependent on another input of type checkbox being checked by adding attribute
@@ -240,7 +239,7 @@ var enErrorDialogs = {
 ```
 
 ```html
-<form action="script.php" onsubmit="return $(this).validate(enErrorDialogs);">
+<form action="script.php">
     ...
 </form>
 <script src="js/jquery.min.js"></script>
