@@ -5,7 +5,7 @@
 * Documentation and issue tracking on Github <https://github.com/victorjonsson/jQuery-Form-Validator/>
 *
 * @license Dual licensed under the MIT or GPL Version 2 licenses
-* @version 1.9.36
+* @version 1.9.37
 */
 (function($) {
 
@@ -109,7 +109,7 @@
         $element
             .removeClass(config.errorElementClass)
             .parent()
-            .find('.jquery_form_error_message').remove();
+            .find('.'+config.errorMessageClass).remove();
 
         // if element has custom err msg container, clear it
         if( elementErrMsgObj != null) {
@@ -143,7 +143,7 @@
             if( elementErrMsgObj != null) {
                 elementErrMsgObj.innerHTML = validation;
             } else { // use regular span append
-                $element.parent().append('<span class="jquery_form_error_message">'+validation+'</span>');
+                $element.parent().append('<span class="'+config.errorMessageClass+'">'+validation+'</span>');
             }
 
             if(config.borderColorOnError !== '') {
@@ -274,7 +274,7 @@
         // Remove possible error messages from last validation
         //
         $('.' + $.split(config.errorMessageClass, ' ').join('.')).remove();
-        $('.jquery_form_error_message').remove();
+        $('.'+config.errorMessageClass).remove();
 
         //
         // Run validation callback
@@ -316,11 +316,11 @@
             else {
                 for (var i = 0; i < errorInputs.length; i++) {
                     var $parent = errorInputs[i].parent();
-                    var $errorSpan = $parent.find('span[class=jquery_form_error_message]');
+                    var $errorSpan = $parent.find('span[class='+config.errorMessageClass+']');
                     if ($errorSpan.length > 0) {
                         $errorSpan.eq(0).text(errorInputs[i].valAttr('current-error'));
                     } else {
-                        $parent.append('<span class="jquery_form_error_message">' + errorInputs[i].valAttr('current-error') + '</span>');
+                        $parent.append('<span class="'+config.errorMessageClass+'">' + errorInputs[i].valAttr('current-error') + '</span>');
                     }
                 }
             }
@@ -465,7 +465,7 @@
                 ignore : [], // Names of inputs not to be validated even though node attribute containing the validation rules tells us to
                 errorElementClass : 'error', // Class that will be put on elements which value is invalid
                 borderColorOnError : 'red', // Border color of elements which value is invalid, empty string to not change border color
-                errorMessageClass : 'jquery_form_error_message', // class name of div containing error messages when validation fails
+                errorMessageClass : 'form-error', // class name of div containing error messages when validation fails
                 validationRuleAttribute : 'data-validation', // name of the attribute holding the validation rules
                 validationErrorMsgAttribute : 'data-validation-error-msg', // define custom err msg inline with element
                 errorMessagePosition : 'element', // Can be either "top" or "element"
