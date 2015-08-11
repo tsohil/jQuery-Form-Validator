@@ -6,7 +6,7 @@ it's designed to require as little bandwidth as possible. This is achieved by gr
 in "modules", making it possible for the programmer to load **only those functions that's needed** to validate a
 particular form.
 
-**Form demos and full documentation is available at http://formvalidator.net/**
+**Form demos and full documentation available at http://formvalidator.net/**
 
 *Usage example*
 
@@ -38,24 +38,22 @@ particular form.
 </script>
 ```
 
-### Moving up to version 2.0
+### Support for HTML5
 
-So what has changed since version 1.x?
+As of version 2.2 (unreleased) you can use this plugin as a fallback solution for the validation attributes in the HTML5 spec. Add the module `html5` to the module declaration and you can use the following native features:
 
- * A whole bunch of validation functions have been added (see below).
- * A modular design have been introduced, which means that some validation functions is default and others is
- part of a module. This in turn lowers server and bandwidth costs.
- * You no longer need to prefix the validation rules with "validate_".
- * Error message position now defaults to "element".
- * The optional features (validateOnBlur and showHelpOnFocus) is now enabled by default.
- * The function $.validate(config) is introduced to reduce the amount of code that has to be written when initiating the form validation.
- * Demos and full documentation is now available at http://formvalidator.net/
+**Attributes**: require, pattern, maxlength, min, max, placeholder
+
+**Input types**: url, date, time, email, number
+
+**Elements**: Use the element `datalist` to create input suggestions
+
 
 ### Default validators and features (no module needed)
  * **url**
  * **email**
  * **domain** — *domain.com*
- * **number** — *float/negative/positive/range*
+ * **number** — *float/negative/positive/range/step*
  * **date** — *yyyy-mm-dd (format can be customized, more information below)*
  * **alphanumeric** — *with support for defining additional characters*
  * **length** — *min/max/range*
@@ -69,14 +67,18 @@ So what has changed since version 1.x?
  * Make validation dependent on another input of type checkbox being checked by adding attribute
  data-validation-if-checked="name of checkbox input"
  * Create input suggestions with ease, no jquery-ui needed
+ * to apply multiple validators to an input element, separate the validator names using a space (ex: required email)
 
 Read the documentation for the default features at [http://formvalidator.net/#default-validators](http://formvalidator.net/#default-validators)
 
 ### Module: security
  * **spamcheck**
  * **confirmation**
- * **strength** — *Validate the strength of a password (strength strength3)*
- * **backend** — *Validate value of input on server side*
+ * **creditcard**
+ * **CVV**
+ * **strength** — *Validate the strength of a password*
+ * **server** — *Validate value of input on server side*
+ * **letternumeric** — *Validate that the input value consists out of only letters and/or numbers*
 
 Read the documentation for the security module at [http://formvalidator.net/#security-validators](http://formvalidator.net/#security-validators)
 
@@ -98,7 +100,8 @@ Read the documentation for the location module at [http://formvalidator.net/#loc
 ### Module: file
  * **mime**
  * **extension**
- * **size**
+ * **size** (file size)
+ * **dimension** ()
 
 Read the documentation for the file module at [http://formvalidator.net/#file-validators](http://formvalidator.net/#file-validators)
 
@@ -214,74 +217,13 @@ It is possible to display help information for each input. The information will 
 
 Read about how to customize this plugin over at [http://formvalidator.net/#configuration](http://formvalidator.net/#configuration)
 
+### Validate On Event ###
+You can cause an element to be validated upon the firing of an event, by attaching an attribute to the form input element named `data-validation-event="click"`. When the configuration settings have `validateOnEvent : true`, the click event will trigger the onBlur validaton for that element. Possible use case: Checkboxes. Instead of waiting for the checkbox to lose focus (blur) and waiting for a validation to occurr, you can specify that elements validation should occur as soon as that checkbox element is clicked.
+
 ## Localization
-This plugin contains a set of error dialogs. In case you don't define an inline error message the plugin
-will fall back on one of the dialogs below. You can how ever add the attribute *data-validation-error-msg* to an
-element, and that message will be displayed instead. All error dialogs can be overwritten by passing an
-object into the validation function.
 
-```javascript
-var enErrorDialogs = {
-    errorTitle : 'Form submission failed!',
-    requiredFields : 'You have not answered all required fields',
-    badTime : 'You have not given a correct time',
-    badEmail : 'You have not given a correct e-mail address',
-    badTelephone : 'You have not given a correct phone number',
-    badSecurityAnswer : 'You have not given a correct answer to the security question',
-    badDate : 'You have not given a correct date',
-    lengthBadStart : 'You must give an answer between ',
-    lengthBadEnd : 'characters',
-    lengthTooLongStart : 'You have given an answer longer than ',
-    lengthTooShortStart : 'You have given an answer shorter than ',
-    notConfirmed : 'Values could not be confirmed',
-    badDomain : 'Incorrect domain value',
-    badUrl : 'The answer you gave was not a correct URL',
-    badCustomVal : 'You gave an incorrect answer',
-    badInt : 'The answer you gave was not a correct number',
-    badSecurityNumber : 'Your social security number was incorrect',
-    badUKVatAnswer : 'Incorrect UK VAT Number',
-    badStrength : 'The password isn\'t strong enough',
-    badNumberOfSelectedOptionsStart : 'You have to choose at least ',
-    badNumberOfSelectedOptionsEnd : ' answers',
-    badAlphaNumeric : 'The answer you gave must contain only alphanumeric characters ',
-    badAlphaNumericExtra: ' and ',
-    wrongFileSize : 'The file you are trying to upload is too large',
-    wrongFileType : 'The file you are trying to upload is of wrong type',
-    groupCheckedTooFewStart : 'Please choose at least ',
-    groupCheckedTooManyStart : 'Please choose a maximum of ', 
-    groupCheckedRangeStart : 'Please choose between ',
-    groupCheckedEnd : ' item(s)'
-};
-```
-
-```html
-<form action="script.php">
-    ...
-</form>
-<script src="js/jquery.min.js"></script>
-<script src="js/form-validator/jquery.form-validator.min.js"></script>
-<script src="js/form-validator/locale.en.js"></script>
-<script>
-  $.validate({
-    language : enErrorDialogs
-  });
-</script>
-...
-```
-
-It's also possible to add inline error messages. If you add attribute `data-validation-error-msg` to an element the value of
-that attribute will be displayed instead of the error dialog that the validation function refers to.
-
-## Input length restriction
-```html
-<p>
-  History (<span id="maxlength">50</span> characters left)
-  <textarea rows="3" id="area"></textarea>
-</p>
-<script type="text/javascript">
-  $('#area').restrictLength( $('#maxlength') );
-</script>
-```
+This plugin comes with translations for English, German, French Spanish and Swedish. You can also choose to override the error
+dialogs yourself. Here you can read more about [localization](http://formvalidator.net/#localization)
 
 ## Program Flow
 Form submit() event is bound to jQ func **validateForm()** when the form is submitted, it calls
@@ -294,15 +236,35 @@ it calls jQ func **$.formUtils.validateInput** to validate the single input when
 
 ## Changelog
 
-#### 2.2.0 (unreleased)
+
+#### 2.2.43
+- Fixed min/max parse error in HTML5 module
+- Now also supports Twitter bootstraps horizontal forms
+- This plugin now also distributes a default CSS theme including success/fail icons (used on formvalidator.net)
+- Email validation now won't fail if email begins with a number
+- This plugin now comes with error dialogs translated to English, French, German, Spanish and English.
+- New validator `letternumeric`. Validates that input consists out of any type of letter (not only alphanumeric) and/or numbers
+- You can now validate image dimension and ratio
+- ... and a bunch of other smaller bug fixes and improvements.
+
+#### 2.2.0
 * Now possible to define an error message for each validation rule on a certain input (issue #113)
 * This plugin now serves as a html5 fallback. You can now use the native attributes to declare which type
 of validation that should be applied.
 * Use a template for error messages when having errorMessagePosition set to top
+* Added validation of credit card number and CVV to the security module
 * Event onElementValidate added
 * Use the attribute data-validation-confirm to declare which input that should be confirmed when using validation=confirmation (issue #112)
 * Validation "required" now supports inputs of type radio
-
+* $.validateForm is now deprecated, use $.isValid instead
+* Possible to check if form is valid programmatically without showing error messages
+* Select elements can now be validated server-side
+* Cleaned up dialog messages
+* Various IE8 fixes
+* Possible to send along parameters to the server when using server side validation
+* Now possible to set your own parameter name when using server side validation
+* Improved/simplified URL validation
+* ... and a whole lot more small improvements
 
 #### 2.1.47
 * Incorrect error-styling when using datepicker or suggestions is now fixed
@@ -342,7 +304,7 @@ calling $.validate()
  the $.validationSetup but it's considered deprecated.
 
 #### 2.1.6
- * Modules can now be loaded from remote website
+ * Modules can now be loaded from remote websites
 
 #### 2.1.5
  * Fixed language bug (issue #43 on github)

@@ -5,6 +5,7 @@
     <title>Form Test</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/black-tie/jquery-ui.css" />
+    <link rel="stylesheet" href="theme-default.css" />
     <style>
 
         /* Form and inputs */
@@ -19,15 +20,10 @@
             width: 375px;
         }
 
-        /* While server is being requested */
-        form.validating-server-side {
-            background: #F2F2F2;
+        button, input[type="submit"], .button {
+            margin-bottom: 8px;
         }
 
-        input.validating-server-side {
-            opacity: 0.5;
-            background: lightgoldenrodyellow;
-        }
 
         /* modify inputs for password strength */
         .password-strength input.form-control {
@@ -43,10 +39,6 @@
         /* Checkboxes */
         .form-group.check-boxes input {
             margin-left: 10px;
-        }
-
-        span.help {
-            color: #999 !important;
         }
 
         /* Error container for form C */
@@ -67,7 +59,7 @@
     <form action="" id="form-a" role="form">
         <div class="form-group">
             <label class="control-label" for="inline-suggestions">Inline suggestions</label>
-            <input name="inline suggestions" type="text" id="inline-suggestions" class="form-control" data-suggestions="Monkey, Horse, Fox, Tiger, Elephant" />
+            <input name="inline suggestions" type="text" id="inline-suggestions" class="form-control" data-suggestions="Monkey, Horse, Hound, Fox, Tiger, Elephant" />
         </div>
 
         <div class="form-group">
@@ -77,15 +69,21 @@
 
         <div class="form-group">
             <label class="control-label" for="country-suggestions">Swedish county suggestions</label>
-            <input name="Swedish county suggestion" data-validation="swecounty" type="text" id="swedish-county-suggestions" class="form-control" />
+            <div>
+                <div>
+                    <!-- Make sure error class "has-error" gets all the way up to .form-group -->
+                    <input name="Swedish county suggestion" data-validation="swecounty" type="text" id="swedish-county-suggestions" class="form-control" />
+                </div>
+            </div>
         </div>
 
         <div class="form-group">
             <label class="control-label">Year</label>
             <input name="birth" class="form-control"
-                   data-validation="date"
-                   data-validation-format="yyyy-mm-dd"
-                   data-suggestions="2014-01-15,2014-01-16,2014-01-17" />
+                   data-validation="length date"
+                   data-validation-length="min5"
+                   data-validation-format="yyyy/mm/dd"
+                   data-suggestions="2014/01/15,2014/01/16,2014/01/17" />
         </div>
 
         <div class="form-group">
@@ -157,34 +155,33 @@
             (<span id="max-len">20</span> chars left)<br />
             <textarea id="text-area" class="form-control" name="some-text"></textarea>
         </div>
-
         <div class="form-group">
             <label class="control-label">Server validation</label>
-            <input class="form-control" name="code"
-                   data-validation-help="The word is &quot;secret&quot;"
-                   data-validation="alphanumeric server"
+            <input class="form-control" name="code" value="secret"
+                   data-validation-helssp="The word is &quot;secret&quot;"
+                   data-validation="length server"
+                   data-validation-length="min2"
                    data-validation-url="http://formvalidator.net/validate-email.php" />
         </div>
-
         <div class="form-group">
             <label class="control-label">File validation</label>
             <input type="file" name="some-file1" class="form-control"
-                   data-validation="size mime required"
-                   data-validation-error-msg="You must upload an image file"
+                   data-validation="size mime required dimension"
+                   data-validation-error-msg-size="The file cant be larger than 400kb"
+                   data-validation-error-msg="You must upload an image file (max 400 kb)"
                    data-validation-allowing="jpg, png, ico"
-                   data-validation-max-size="100kb" />
+                   data-validation-dimension="100-800"
+                   data-validation-ratio="8:10-12:10"
+                   data-validation-max-size="400kb" />
         </div>
-
         <div class="form-group">
-            <label class="control-label">File validation (multiple)</label>
-            <input type="file" multiple="multiple" name="some-file2" class="form-control"
-                   data-validation="size mime required length"
-                   data-validation-length="min2"
-                   data-validation-error-msg="You must upload at least two image files"
+            <label class="control-label">File name</label>
+            <input type="text" name="some-file2" class="form-control"
+                   data-validation="extension required"
+                   data-validation-error-msg="You must write a file name with extension jpg|png|ico"
                    data-validation-allowing="jpg, png, ico"
-                   data-validation-max-size="100kb" />
+                    />
         </div>
-
         <div class="form-group">
             <label class="control-label">
                 Callback validation, set this value to &quot;1&quot; and
@@ -213,8 +210,20 @@
                 <input type="checkbox" name="box" value="5" /> 5
             </label>
         </div>
-        <p>
+
+        <p style="line-height: 200%">
             <input type="submit" class="button">
+            <br />
+            <button class="button" type="button"
+                    onclick="alert('Form a is ' + ( $('#form-a').isValid({}, {}, false) ? 'VALID':'NOT VALID'));">
+                Test validation via js (<strong>without error messages</strong>)
+            </button>
+            <br />
+            <button class="button" type="button"
+                    onclick="alert('Form a is ' + ( $('#form-a').isValid() ? 'VALID':'NOT VALID'));">
+                Test validation via js (showing error messages)
+            </button>
+            <br />
             <input type="reset" class="button">
         </p>
     </form>
@@ -223,6 +232,14 @@
         <div class="form-group">
             <label class="control-label">Test</label>
             <input name="test" data-validation="number" type="text" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Password</label>
+            <input name="pass" data-validation="confirmation" type="password" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Password again</label>
+            <input name="pass_confirmation" type="password" />
         </div>
         <p>
             <input type="submit" class="button">
@@ -265,7 +282,12 @@
         <h2>HTML5 attributes</h2>
         <div class="form-group">
             <label class="control-label">type="email"</label>
-            <input type="email" required="required" />
+            <input type="email" required="required" list="da-mejl" />
+            <datalist id="da-mejl">
+                <option value="Test">Test</option>
+                <option value="test2">test2</option>
+                <option value="test3">test3</option>
+            </datalist>
         </div>
         <div class="form-group">
             <label class="control-label">type="url" (optional)</label>
@@ -285,7 +307,14 @@
         </div>
         <div class="form-group">
             <label class="control-label">pattern="^([a-z]+)$"</label>
-            <input type="text" pattern="^([a-z]+)$" required="required" />
+            <input type="text" name="some-colorz" list="some-colorz" pattern="^([a-z]+)$" required="required" />
+            <datalist id="some-colorz" style="display: none">
+                <option value="Green">Green</option>
+                <option value="Blue">Blue</option>
+                <option value="Red">Red</option>
+                <option value="Black">Black</option>
+                <option value="White">White</option>
+            </datalist>
         </div>
         <p>
             <input type="submit" class="button">
@@ -299,7 +328,7 @@
 <script>
 (function($, window) {
 
-    var dev = window.location.hash.indexOf('dev') > -1 ? '.dev' : '';
+    var dev = '.dev'; //window.location.hash.indexOf('dev') > -1 ? '.dev' : '';
 
     // setup datepicker
     $("#datepicker").datepicker();
@@ -315,7 +344,7 @@
         errorMessageKey: 'badEvenNumber'
     });
 
-    window.applyValidation = function(validateOnBlur, forms, messagePosition) {
+    window.applyValidation = function(validateOnBlur, forms, messagePosition, xtraModule) {
         if( !forms )
             forms = 'form';
         if( !messagePosition )
@@ -329,8 +358,9 @@
             validateOnBlur : validateOnBlur,
             errorMessagePosition : messagePosition,
             scrollToTopOnError : true,
-            borderColorOnError : 'purple',
-            modules : 'security'+dev+', location'+dev+', sweden'+dev+', html5'+dev+', file'+dev+', uk'+dev,
+            lang : 'sv',
+           // borderColorOnError : 'purple',
+            modules : 'security'+dev+', location'+dev+', sweden'+dev+', file'+dev+', uk'+dev +( xtraModule ? ','+xtraModule:''),
             onModulesLoaded: function() {
                 $('#country-suggestions').suggestCountry();
                 $('#swedish-county-suggestions').suggestSwedishCounty();
@@ -349,9 +379,7 @@
                 }
             },
             onError : function($form) {
-                if( !$.formUtils.haltValidation ) {
-                    alert('Invalid '+$form.attr('id'));
-                }
+                alert('Invalid '+$form.attr('id'));
             },
             onSuccess : function($form) {
                 alert('Valid '+$form.attr('id'));
@@ -365,7 +393,7 @@
     window.applyValidation(true, '#form-a', 'top');
     window.applyValidation(false, '#form-b', 'element');
     window.applyValidation(true, '#form-c', $('#error-container'));
-    window.applyValidation(true, '#form-d', 'element');
+    window.applyValidation(true, '#form-d', 'element', 'html5'+dev);
 
     // Load one module outside $.validate() even though you do not have to
     $.formUtils.loadModules('date'+dev+'.js', false, false);
@@ -388,5 +416,5 @@
 
 })(jQuery, window);
 </script>
-<body>
+</body>
 </html>
